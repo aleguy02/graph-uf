@@ -1,1 +1,2 @@
-backend
+### Running Tests
+`python -m pytest`
