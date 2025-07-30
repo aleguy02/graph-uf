@@ -4,6 +4,7 @@ Run this test with `python -m pytest tests/test_graph.py`
 """
 
 from src.graph import Graph
+import pdb
 
 
 def test_basic_chain():
@@ -71,3 +72,11 @@ def test_complex_chain(complex_g):
     adj_list = complex_g.getAdjList()
     for e in expected_edges:
         assert adj_list[e[0]] == e[1]
+
+
+def test_postreqs(complex_g):
+    root = "MAC2311"
+
+    expected_postreqs = {"MAC2312", "COT3100", "COP3503", "COP3530"}
+    foo = complex_g.postreqs(root)
+    assert foo == expected_postreqs
