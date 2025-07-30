@@ -1,3 +1,7 @@
+"""
+Test for Flask app factory pattern
+"""
+
 from app import create_app
 
 
