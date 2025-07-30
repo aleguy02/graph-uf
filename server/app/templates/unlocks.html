@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+</head>
+<body>
+  {% include 'nav_header.html' %}
+
+  <h1>{{ code }} is a prerequisite for:</h1>
+
+  {% if unlocked %}
+    <ul>
+      {% for course in unlocked %}
+        <li>{{ course }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>No courses found.</em></p>
+  {% endif %}
+
+  <p><a href="{{ url_for('main.index') }}">← back</a></p>
+</body>
+</html>
