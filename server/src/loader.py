@@ -3,10 +3,13 @@ from pathlib import Path
 from .graph import Graph
 
 _JSON_PATH = Path(__file__).parent / "json" / "soc_cleaned.json"
-_COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}\b")
+_COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}[A-Z]?\b")
+
 
 def _extract_codes(s: str):
+    s = s.split("Coreq")[0]  # we don't care about prerequisites
     return (c.replace(" ", "") for c in _COURSE_RE.findall(s or ""))
+
 
 def build_graph() -> Graph:
     data = json.loads(_JSON_PATH.read_text(encoding="utf-8"))
