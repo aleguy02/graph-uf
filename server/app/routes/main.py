@@ -9,7 +9,7 @@ main_bp: Blueprint = Blueprint("main", __name__)
 config = get_config()
 
 import re
-CODE_RE = re.compile(r'^[A-Z]{3,4}\d{4}')
+CODE_RE = re.compile(r'^[A-Z]{3,4}\d{4}[A-Z]?')
 
 def normalise(code: str) -> str | None:
     m = CODE_RE.match(code.upper().replace(' ', ''))
