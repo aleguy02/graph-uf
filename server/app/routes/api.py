@@ -4,16 +4,6 @@ from flask import Blueprint, current_app, jsonify, abort
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-@api_bp.get("/unlocks/<code>")
-def unlocks(code: str):
-    """
-    Returns courses that <code> is a prerequesite for
-    """
-    graph = current_app.config["COURSE_GRAPH"]
-    unlocked = sorted(graph.getAdjList().get(code.upper(), []))
-    if not unlocked:
-        abort(404, f"{code} not a prerequesite")
-    return jsonify(unlocked)
 
 @api_bp.get("/unlocks/<code>")
 def unlocks(code: str):

@@ -15,7 +15,7 @@ def test_loader():
         "code": "COP3503C",
         "prerequisites": "Prereq: COP 3502C and MAC 2311 both with minimum grades of C.",
     }
-    assert mock(c1) == ("COP3503", ["COP3502", "MAC2311"])
+    assert mock(c1) == ("COP3503C", ["COP3502C", "MAC2311"])
 
     c2 = {"code": "EGS6949", "prerequisites": "Coreq: EGS 6940."}
     assert mock(c2) == ("EGS6949", [])
