@@ -7,7 +7,7 @@ _COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}[A-Z]?\b")
 
 
 def _extract_codes(s: str):
-    s = s.split("Coreq")[0]  # we don't care about prerequisites
+    s = s.split("Coreq")[0]  # we don't care about corequisites
     return (c.replace(" ", "") for c in _COURSE_RE.findall(s or ""))
 
 
