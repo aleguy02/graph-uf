@@ -8,9 +8,41 @@ import requests
 import os
 
 BASE_URL = "https://one.uf.edu/apix/soc/schedule"
+semesters = {
+    # 2018
+    "f18": "2188",
+    # 2019
+    "sp19": "2191",
+    "sm19": "2195",
+    "f19": "2198",
+    # 2020
+    "sp20": "2201",
+    "sm20": "2205",
+    "f20": "2208",
+    # 2021
+    "sp21": "2211",
+    "sm21": "2215",
+    "f21": "2218",
+    # 2022
+    "sp22": "2221",
+    "sm22": "2225",
+    "f22": "2228",
+    # 2023
+    "sp23": "2231",
+    "sm23": "2235",
+    "f23": "2238",
+    # 2024
+    "sp24": "2241",
+    "sm24": "2245",
+    "f24": "2248",
+    # 2025
+    "sp25": "2251",
+    "sm25": "2255",
+    "f25": "2258",
+}
 
 
-def generate_soc_request_url(
+def _generate_soc_request_url(
     term: str, program: str, last_control_number: int = 0
 ) -> str:
     """
@@ -76,9 +108,10 @@ def fetch_soc(
         next_last_control_num = (
             last["LASTCONTROLNUMBER"] if (last is not None) else last_control_number
         )
-        url = generate_soc_request_url(
+        url = _generate_soc_request_url(
             term, program, last_control_number=next_last_control_num
         )
+        print(url)
 
         request = requests.get(url)
         last = json.loads(request.text)[0]
@@ -87,18 +120,21 @@ def fetch_soc(
 
 
 if __name__ == "__main__":
-    try:
+    for s, term in semesters.items():
+        try:
 
-        print("=== fetching SoC ===")
-        soc_scraped = fetch_soc("2255", "CWSP")
+            print(f"=== fetching SoC - {s} ===")
+            soc_scraped = fetch_soc(term, "CWSP")
 
-        fp = os.path.join(os.getcwd(), "src", "json", "soc_scraped.json")
-        print(f"=== writing to {fp} ===")
-        soc_str = json.dumps(soc_scraped)  # Convert to JSON
-        with open(fp, "w") as f:  # Save JSON as file
-            f.write(soc_str)
+            fp = os.path.join(os.getcwd(), "src", "json", f"soc_scraped_{s}.json")
+            print(f"=== writing to {fp} ===")
+            soc_str = json.dumps(soc_scraped)  # Convert to JSON
+            with open(fp, "w") as f:  # Save JSON as file
+                f.write(soc_str)
 
-        print("DONE")
+            print("DONE")
 
-    except Exception as e:
-        print(f"!! An exception occured: {e} !!")
+        except Exception as e:
+            print(
+                f"!! An exception occured: {e} !!"
+            )  # I think something is going wrong with sp22, need to look into it
