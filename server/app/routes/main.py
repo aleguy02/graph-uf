@@ -43,7 +43,10 @@ def unlocks_page(code: str):
         abort(404, "Bad course code")
 
     graph = current_app.config["COURSE_GRAPH"]
-    unlocked = sorted(graph.getAdjList().get(base, []))
+    try:
+        unlocked = sorted(graph.postreqs(base))  #all downstream courses
+    except ValueError:
+        abort(404, f"{base} not found in catalog")
     #shows empty list
     return render_template("unlocks.html",
                            title=f"{base} unlocks…",

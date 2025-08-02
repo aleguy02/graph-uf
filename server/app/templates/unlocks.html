@@ -5,87 +5,26 @@
   <meta charset="utf-8" />
   <title>{{ title }}</title>
   <style>
-    .course-item { margin-bottom: 0.5em; cursor: pointer; }
-    .children-list { margin-left: 0.75em; margin-top: 0.25em; list-style-type: disc; }
-    .toggle { margin-right: 0.5em; }
+    body { font-family: sans-serif; max-width: 40rem; margin: 2rem auto; }
+    ul { padding-left: 1.25rem; }
   </style>
 </head>
 <body>
   {% include 'nav_header.html' %}
 
-  <h1>Courses unlocked by {{ code }}</h1>
+  <h1>All courses unlocked by {{ code }}</h1>
 
   {% if unlocked %}
-  <ul id="postreq-tree">
-    {% for course in unlocked %}
-      <li class="course-item" data-code="{{ course }}">
-        <span class="toggle">[+]</span>
-        <span class="course-name">{{ course }}</span>
-        <ul class="children-list" style="display:none;"></ul>
-      </li>
-    {% endfor %}
-  </ul>
+    <p><strong>Total:</strong> {{ unlocked|length }}</p>
+    <ul>
+      {% for course in unlocked %}
+        <li>{{ course }}</li>
+      {% endfor %}
+    </ul>
   {% else %}
-    <p><em>No courses found.</em></p>
+    <p><em>No courses depend on {{ code }}.</em></p>
   {% endif %}
 
   <p><a href="{{ url_for('main.index') }}">← back</a></p>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const tree = document.getElementById('postreq-tree');
-
-      tree.addEventListener('click', async (e) => {
-        const li = e.target.closest('.course-item');
-        if (!li) return;
-        e.stopPropagation();
-
-        const toggle = li.querySelector('.toggle');
-        const sublist = li.querySelector('.children-list');
-
-        // fetch only once per node
-        if (!li.dataset.loaded) {
-          const code = li.dataset.code;
-          try {
-            const res = await fetch(`/api/unlocks/${code}`);
-            if (!res.ok) throw new Error(res.statusText);
-            const children = await res.json();
-            if (children.length) {
-              children.forEach(child => {
-                const childLi = document.createElement('li');
-                childLi.className = 'course-item';
-                childLi.dataset.code = child;
-                childLi.innerHTML = `
-                  <span class="toggle">[+]</span>
-                  <span class="course-name">${child}</span>
-                  <ul class="children-list" style="display:none;"></ul>
-                `;
-                sublist.appendChild(childLi);
-              });
-            } else {
-              const liEmpty = document.createElement('li');
-              liEmpty.innerHTML = '<em>No further unlocks</em>';
-              sublist.appendChild(liEmpty);
-            }
-          } catch (err) {
-            console.error(err);
-            const liErr = document.createElement('li');
-            liErr.innerHTML = '<em>Failed to load.</em>';
-            sublist.appendChild(liErr);
-          }
-          li.dataset.loaded = 'true';
-        }
-
-        // toggle visibility
-        if (sublist.style.display === 'none') {
-          sublist.style.display = 'block';
-          toggle.textContent = '[-]';
-        } else {
-          sublist.style.display = 'none';
-          toggle.textContent = '[+]';
-        }
-      });
-    });
-  </script>
 </body>
 </html>
