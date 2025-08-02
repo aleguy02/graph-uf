@@ -2,17 +2,27 @@
 Routes to serve main static pages. Not sure if this is how we'll do the frontend so we'll probably have to change it
 """
 
-from flask import Blueprint, render_template, url_for, redirect, current_app, request, abort
+from flask import (
+    Blueprint,
+    render_template,
+    url_for,
+    redirect,
+    current_app,
+    request,
+    abort,
+)
 from app.config import get_config
 
 main_bp: Blueprint = Blueprint("main", __name__)
 config = get_config()
 
 import re
-CODE_RE = re.compile(r'^[A-Z]{3,4}\d{4}[A-Z]?')
+
+CODE_RE = re.compile(r"^[A-Z]{3,4}\d{4}[A-Z]?")
+
 
 def normalise(code: str) -> str | None:
-    m = CODE_RE.match(code.upper().replace(' ', ''))
+    m = CODE_RE.match(code.upper().replace(" ", ""))
     return m.group(0) if m else None
 
 
@@ -27,9 +37,10 @@ def index():
         url=config.URL,
     )
 
+
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
-    raw  = request.form.get("code", "")
+    raw = request.form.get("code", "")
     base = normalise(raw)
     if not base:
         return redirect(url_for("main.index"))
@@ -44,8 +55,7 @@ def unlocks_page(code: str):
 
     graph = current_app.config["COURSE_GRAPH"]
     unlocked = sorted(graph.getAdjList().get(base, []))
-    #shows empty list
-    return render_template("unlocks.html",
-                           title=f"{base} unlocks…",
-                           code=base,
-                           unlocked=unlocked)
+    # shows empty list
+    return render_template(
+        "unlocks.html", title=f"{base} unlocks…", code=base, unlocked=unlocked
+    )
