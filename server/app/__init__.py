@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from app.routes.main import main_bp
 from app.routes.api import api_bp
 from pathlib import Path
-from src.loader import build_graph
+from src.loader import build_graph, build_tcm
 
 
 def create_app(test_config=None):
@@ -10,6 +10,7 @@ def create_app(test_config=None):
 
     try:
         app.config["COURSE_GRAPH"] = build_graph()
+        app.config["COURSE_TCM"] = build_tcm()
     except Exception as e:
         app.logger.error(f"Failed to build course graph: {e}")
         raise RuntimeError("App init failed due to course graph error") from e

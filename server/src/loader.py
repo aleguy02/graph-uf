@@ -1,6 +1,7 @@
 import json, re
 from pathlib import Path
 from .graph import Graph
+from .tcm import TCM
 
 semesters = [
     # 2018
@@ -61,3 +62,9 @@ def build_graph() -> Graph:
             for p in _extract_codes(c.get("prerequisites", "")):
                 g.insertEdge(p.upper(), tgt)
     return g
+
+def build_tcm() -> TCM:
+    graph = build_graph()
+    tcm = TCM.from_graph(graph)
+    return tcm
+
