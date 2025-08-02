@@ -1,4 +1,5 @@
-from src.tcm import TCM, Graph
+from src.tcm import TCM
+from src.graph import Graph
 
 def test_tcm_matches_graph(complex_g: Graph):
     tcm = TCM.from_graph(complex_g)
