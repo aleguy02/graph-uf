@@ -3,7 +3,7 @@ Tests for graph implementation with UF data
 Run this test with `python -m pytest tests/test_graph.py`
 """
 
-from src.graph import Graph
+from src.graph import Graph, TCM
 import pdb
 
 
@@ -78,5 +78,22 @@ def test_postreqs(complex_g):
     root = "MAC2311"
 
     expected_postreqs = {"MAC2312", "COT3100", "COP3503", "COP3530"}
-    foo = complex_g.postreqs(root)
-    assert foo == expected_postreqs
+    postreqs = complex_g.postreqs(root)
+    assert postreqs == expected_postreqs
+
+
+def test_tcm(complex_g):
+    tcm = TCM(complex_g.adj_list)
+    
+    expected_closure = {
+        "COP3530": set(),
+        "COP3504": {"COP3530"},
+        "COP3503": {"COP3530"},
+        "COT3100": {"COP3530"},
+        "MAC2312": {"COP3530"},
+        "COP3502": {"COP3503", "COT3100", "COP3530"},
+        "MAC3472": {"MAC2312", "COT3100", "COP3530"},
+        "MAC2311": {"MAC2312", "COT3100", "COP3503", "COP3530"},
+    }
+    closure = tcm.closure()
+    assert closure == expected_closure

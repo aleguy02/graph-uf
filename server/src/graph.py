@@ -23,6 +23,7 @@ class Graph:
 
     def postreqs(self, root: str):
         """
+        BFS traversal from root to all reachable nodes.
         Returns all classes that require root as in their prerequisite chain
         """
         if root not in self.adj_list:
@@ -46,3 +47,16 @@ class Graph:
 
         v.remove(root)
         return v
+
+
+class TCM(Graph):  # transitive closure map maintains postreqs for EVERY class
+    def __init__(self, adj_list=None):
+        super().__init__()
+        if adj_list:
+            self.adj_list = adj_list.copy()
+
+    def closure(self):
+        closure = {}
+        for course in self.adj_list:
+            closure[course] = self.postreqs(course)
+        return closure
