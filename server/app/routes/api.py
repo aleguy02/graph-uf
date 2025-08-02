@@ -36,10 +36,7 @@ def prereqs(code: str):
     if key not in adj and all(key not in targets for targets in adj.values()):
         abort(404, f"{key} not found in catalog")
 
-    direct = sorted(
-        src for src, targets in adj.items()
-        if key in targets
-    )
+    direct = sorted(src for src, targets in adj.items() if key in targets)
     return jsonify(direct)
 
 

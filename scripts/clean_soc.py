@@ -1,5 +1,9 @@
-## Limit duplicate courses to their first instance
+"""
+Limit duplicate courses to their first instance
+"""
+
 import json, os
+from scrape_soc import semesters
 
 APP_DIR = "./"
 
@@ -26,18 +30,18 @@ def clean_soc(fp: str) -> dict:
 
 
 if __name__ == "__main__":
-    try:
+    for s, term in semesters.items():
+        try:
+            print(f"=== removing duplicates from SoC - {s} ===")
+            fp = os.path.join(os.getcwd(), "src", "json", f"soc_scraped_{s}.json")
+            without_duplicates = clean_soc(fp)
 
-        print("=== removing duplicates from SoC ===")
-        fp = os.path.join(os.getcwd(), "src", "json", "soc_scraped.json")
-        without_duplicates = clean_soc(fp)
+            fp = os.path.join(os.getcwd(), "src", "json", f"soc_cleaned_{s}.json")
+            print(f"=== writing to {fp} ===")
+            with open(fp, "w") as f:
+                json.dump(without_duplicates, f)
 
-        fp = os.path.join(os.getcwd(), "src", "json", "soc_cleaned.json")
-        print(f"=== writing to {fp} ===")
-        with open(fp, "w") as f:
-            json.dump(without_duplicates, f)
+            print("DONE")
 
-        print("DONE")
-
-    except Exception as e:
-        print(f"!! An exception occured: {e} !!")
+        except Exception as e:
+            print(f"!! An exception occured for {s}: {e} !!")
