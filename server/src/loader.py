@@ -1,6 +1,7 @@
 import json, re
 from pathlib import Path
 from .graph import Graph
+from .tcm import TCM
 
 _JSON_PATH = Path(__file__).parent / "json" / "soc_cleaned.json"
 _COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}[A-Z]?\b")
@@ -19,3 +20,9 @@ def build_graph() -> Graph:
         for p in _extract_codes(c.get("prerequisites", "")):
             g.insertEdge(p.upper(), tgt)
     return g
+
+def build_tcm() -> TCM:
+    graph = build_graph()
+    tcm = TCM.from_graph(graph)
+    return tcm
+
