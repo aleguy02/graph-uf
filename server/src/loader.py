@@ -55,16 +55,19 @@ def _extract_codes(s: str):
 def build_graph() -> Graph:
     g = Graph()
 
-    for fp in _JSON_PATHS:
+    for sem, fp in zip(semesters, _JSON_PATHS):
+        if not fp.exists(): #for missing semesters
+            continue
+
         data = json.loads(fp.read_text(encoding="utf-8"))
         for c in data["courses"]:
             tgt = c["code"].strip().upper()
             for p in _extract_codes(c.get("prerequisites", "")):
-                g.insertEdge(p.upper(), tgt)
+                g.insertEdge(p.upper(), tgt, sem)
     return g
 
 def build_tcm() -> TCM:
     graph = build_graph()
-    tcm = TCM.from_graph(graph)
+    tcm = TCM.from_graph(graph, semesters)
     return tcm
 

@@ -27,7 +27,7 @@ def runner(app):
 @pytest.fixture
 def complex_g():
     g = Graph()
-
+    sem = "sm25"
     # see docs/images/complex-chain-simplified.png for a visual of these courses
     courses = [
         {
@@ -66,6 +66,6 @@ def complex_g():
 
     for crs in courses:
         for prereq in crs["prerequisites"]:
-            g.insertEdge(prereq, crs["code"])
+            g.insertEdge(prereq, crs["code"], sem)
 
     return g
