@@ -12,17 +12,36 @@
 <body>
   {% include 'nav_header.html' %}
 
-  <h1>All courses unlocked by {{ code }}</h1>
+  <h1>
+      All courses unlocked by {{ code }}
+      in {{ selected_semester|upper }}
+  </h1>
+
+  <form
+          method="get"
+          action="{{ url_for('main.unlocks_page', code=code) }}">
+      <label for="semester-select">Semester:</label>
+      <select id="semester-select" name="semester">
+          {% for sem in semesters %}
+              <option
+                      value="{{ sem }}"
+                      {% if sem == selected_semester %}selected{% endif %}>
+                  {{ sem|upper }}
+              </option>
+          {% endfor %}
+      </select>
+      <button type="submit">Switch</button>
+  </form>
 
   {% if unlocked %}
-    <p><strong>Total:</strong> {{ unlocked|length }}</p>
-    <ul>
-      {% for course in unlocked %}
-        <li>{{ course }}</li>
-      {% endfor %}
-    </ul>
+      <p><strong>Total:</strong> {{ unlocked|length }}</p>
+      <ul>
+          {% for course in unlocked %}
+              <li>{{ course }}</li>
+          {% endfor %}
+      </ul>
   {% else %}
-    <p><em>No courses depend on {{ code }}.</em></p>
+      <p><em>No courses depend on {{ code }}.</em></p>
   {% endif %}
 
   <p><a href="{{ url_for('main.index') }}">← back</a></p>
