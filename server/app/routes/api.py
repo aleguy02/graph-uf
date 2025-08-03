@@ -1,6 +1,6 @@
 # server/app/routes/api.py
 
-from flask import Blueprint, current_app, jsonify, abort
+from flask import Blueprint, current_app, jsonify, abort, request
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -12,8 +12,9 @@ def unlocks(code: str):
     """
     graph = current_app.config["COURSE_GRAPH"]
     key = code.upper().strip()
+    sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     try:
-        unlocked = sorted(graph.postreqs(key))
+        unlocked = sorted(graph.postreqs(key, sem))
     except ValueError:
         abort(404, f"{key} not found in catalog")
     return jsonify(unlocked)
@@ -26,7 +27,7 @@ def prereqs(code: str):
     """
     graph = current_app.config["COURSE_GRAPH"]
     key = code.upper().strip()
-
+    sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     # build the reverse lookup: any course X where adj_list[X] contains key
     try:
         adj = graph.getAdjList()
@@ -36,7 +37,7 @@ def prereqs(code: str):
     if key not in adj and all(key not in targets for targets in adj.values()):
         abort(404, f"{key} not found in catalog")
 
-    direct = sorted(src for src, targets in adj.items() if key in targets)
+    direct = sorted(src for src, targets in adj.items() if key in targets and sem in targets[key])
     return jsonify(direct)
 
 

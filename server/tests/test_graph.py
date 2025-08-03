@@ -6,6 +6,7 @@ Run this test with `python -m pytest tests/test_graph.py`
 from src.graph import Graph
 import pdb
 
+SEM = "sm25"
 
 def test_basic_chain():
     g = Graph()
@@ -17,7 +18,7 @@ def test_basic_chain():
     }
 
     for prereq in crs1["prerequisites"]:
-        g.insertEdge(prereq, crs1["code"])
+        g.insertEdge(prereq, crs1["code"], SEM)
 
     # expected_graph = {
     #     "MAC2312": {"EEL3111C"},
@@ -27,15 +28,15 @@ def test_basic_chain():
 
     expected_edges = [
         # this is a python equivalent to pair<string, unordered_set<string>>
-        ("MAC2312", {"EEL3111C"}),
-        ("PHY2049", {"EEL3111C"}),
-        ("EEL3111C", set()),
+        ("MAC2312", {"EEL3111C": {SEM}}),
+        ("PHY2049", {"EEL3111C": {SEM}}),
+        ("EEL3111C", {}),
     ]
 
     adj_list = g.getAdjList()
 
-    for e in expected_edges:
-        assert adj_list[e[0]] == e[1]
+    for key, inner in expected_edges:
+        assert adj_list[key] == inner
 
     ## Course 2
     crs2 = {
@@ -44,39 +45,39 @@ def test_basic_chain():
     }
 
     for prereq in crs2["prerequisites"]:
-        g.insertEdge(prereq, crs2["code"])
+        g.insertEdge(prereq, crs2["code"], SEM)
 
     expected_edges = [
-        ("EEX2000", {"EEX3097"}),
-        ("EEX3093", {"EEX3097"}),
-        ("EEX3097", set()),
+        ("EEX2000", {"EEX3097": {SEM}}),
+        ("EEX3093", {"EEX3097": {SEM}}),
+        ("EEX3097", {}),
     ]
 
     adj_list = g.getAdjList()
-    for e in expected_edges:
-        assert adj_list[e[0]] == e[1]
+    for key, inner in expected_edges:
+        assert adj_list[key] == inner
 
 
 def test_complex_chain(complex_g):
     expected_edges = [
-        ("MAC2311", {"MAC2312", "COT3100", "COP3503"}),
-        ("MAC3472", {"MAC2312", "COT3100"}),
-        ("COP3502", {"COT3100", "COP3503"}),
-        ("MAC2312", {"COP3530"}),
-        ("COT3100", {"COP3530"}),
-        ("COP3503", {"COP3530"}),
-        ("COP3504", {"COP3530"}),
-        ("COP3530", set()),
+        ("MAC2311", {"MAC2312": {SEM}, "COT3100": {SEM}, "COP3503": {SEM}}),
+        ("MAC3472", {"MAC2312": {SEM}, "COT3100": {SEM}}),
+        ("COP3502", {"COT3100": {SEM}, "COP3503": {SEM}}),
+        ("MAC2312", {"COP3530": {SEM}}),
+        ("COT3100", {"COP3530": {SEM}}),
+        ("COP3503", {"COP3530": {SEM}}),
+        ("COP3504", {"COP3530": {SEM}}),
+        ("COP3530", {}),
     ]
 
     adj_list = complex_g.getAdjList()
-    for e in expected_edges:
-        assert adj_list[e[0]] == e[1]
+    for key, inner in expected_edges:
+        assert adj_list[key] == inner
 
 
 def test_postreqs(complex_g):
     root = "MAC2311"
 
     expected_postreqs = {"MAC2312", "COT3100", "COP3503", "COP3530"}
-    postreqs = complex_g.postreqs(root)
+    postreqs = complex_g.postreqs(root, SEM)
     assert postreqs == expected_postreqs

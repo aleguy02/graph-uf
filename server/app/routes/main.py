@@ -34,6 +34,8 @@ def index():
     return render_template(
         "index.html",
         title="UF Scheduler",
+        semesters=current_app.config["SEMESTERS"],
+        default_semester=current_app.config["DEFAULT_SEMESTER"],
         url=config.URL,
     )
 
@@ -41,10 +43,11 @@ def index():
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
     raw = request.form.get("code", "")
+    sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
     base = normalise(raw)
     if not base:
         return redirect(url_for("main.index"))
-    return redirect(url_for("main.unlocks_page", code=base))
+    return redirect(url_for("main.unlocks_page", code=base, semester=sem))
 
 
 @main_bp.route("/unlocks/<code>")
@@ -53,13 +56,17 @@ def unlocks_page(code: str):
     if not base:
         abort(404, "Bad course code")
 
+    sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     graph = current_app.config["COURSE_GRAPH"]
     try:
-        unlocked = sorted(graph.postreqs(base))  #all downstream courses
+        unlocked = sorted(graph.postreqs(base, sem))  #all downstream courses
     except ValueError:
         abort(404, f"{base} not found in catalog")
     #shows empty list
     return render_template("unlocks.html",
                            title=f"{base} unlocks…",
                            code=base,
-                           unlocked=unlocked)
+                           unlocked=unlocked,
+                           semesters=current_app.config["SEMESTERS"],
+                           selected_semester=sem
+                           )

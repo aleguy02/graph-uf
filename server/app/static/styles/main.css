@@ -270,6 +270,48 @@ ul {
   display: none;
 }
 
+/*tooltip for course hover*/
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip .tooltip-box {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(0.75rem);
+  margin-bottom: 0.5rem;
+  width: 16rem;
+  background: #333;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  text-align: left;
+  z-index: 10;
+}
+
+.tooltip .tooltip-box::after {
+  content: "";
+  position: absolute;
+  left: -0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 0.25rem;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+
+.tooltip:hover .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+}
+
 @media screen and (max-width: 768px) {
   .responsive-text-lg {
     display: none;
