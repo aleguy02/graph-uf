@@ -22,7 +22,7 @@ class Graph:
     def getAdjList(self):
         return self.adj_list
 
-    def postreqs(self, root: str, semester: str):
+    def postreqs(self, root: str, semester: str) -> set[str]:
         """
         BFS traversal from root to all reachable nodes.
         Returns all classes that require root as in their prerequisite chain
