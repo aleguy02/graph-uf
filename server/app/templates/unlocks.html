@@ -24,7 +24,12 @@
                   {{ sem|upper }}
               </option>
           {% endfor %}
-      </select>
+      </select><br /><br />
+        <label for="view_type">Data Structure:</label><br />
+        <select id="view_type" name="view_type">
+        <option value="tcm">Transative Closure Map</option>
+        <option value="graph">Graph</option>
+        </select><br /><br />
       <button type="submit">Switch</button>
   </form>
 

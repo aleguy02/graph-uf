@@ -44,10 +44,15 @@ def index():
 def unlocks_redirect():
     raw = request.form.get("code", "")
     sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
+    view = request.form.get("view_type", "")
     base = normalise(raw)
+
     if not base:
         return redirect(url_for("main.index"))
-    return redirect(url_for("main.unlocks_page", code=base, semester=sem))
+    if view != "tcm" and view != "graph":
+        abort(404, "Bad view type")
+        
+    return redirect(url_for("main.unlocks_page", code=base, semester=sem, view_type=view))
 
 
 @main_bp.route("/unlocks/<code>")
@@ -57,7 +62,15 @@ def unlocks_page(code: str):
         abort(404, "Bad course code")
 
     sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
-    graph = current_app.config["COURSE_GRAPH"]
+    view = request.args.get("view_type", "")
+    if view != "tcm" and view != "graph":
+        abort(404, "Bad view type")
+
+    graph = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
+    
+    # TODO: add tests to make sure that the right graph class is being assigned to graph. For now, uncomment this line to check
+    # print(type(graph).__name__)
+
     try:
         unlocked = sorted(graph.postreqs(base, sem))  #all downstream courses
     except ValueError:

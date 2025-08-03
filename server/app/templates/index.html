@@ -25,16 +25,21 @@
   <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
     <label for="code">Course code:</label><br />
     <input id="code" name="code" required /><br /><br />
-      <label for="semester">Semester:</label><br />
-      <select id="semester" name="semester">
-          {% for sem in semesters %}
-              <option
-                      value="{{ sem }}"
-                      {% if sem == default_semester %}selected{% endif %}>
-                  {{ sem|upper }}
-              </option>
-          {% endfor %}
-      </select><br /><br />
+    <label for="semester">Semester:</label><br />
+    <select id="semester" name="semester">
+        {% for sem in semesters %}
+            <option
+                    value="{{ sem }}"
+                    {% if sem == default_semester %}selected{% endif %}>
+                {{ sem|upper }}
+            </option>
+        {% endfor %}
+    </select><br /><br />
+    <label for="view_type">Data Structure:</label><br />
+    <select id="view_type" name="view_type">
+      <option value="tcm">Transative Closure Map</option>
+      <option value="graph">Graph</option>
+    </select><br /><br />
     <button type="submit">Show what it unlocks (what it is a prerequesite for)</button>
   </form>
 </body>
