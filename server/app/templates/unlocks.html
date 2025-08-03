@@ -33,10 +33,10 @@
       <button type="submit">Switch</button>
   </form>
 
-  {% if unlocked %}
-      <p><strong>Total:</strong> {{ unlocked|length }}</p>
+  {% if new_unlocked %}
+      <p><strong>Classes newly unlocked by {{ code }}:</strong> {{ new_unlocked|length }}</p>
       <ul>
-          {% for course in unlocked %}
+          {% for course in new_unlocked %}
               <li>
                   <span class="tooltip">
                       {{ course }}
@@ -51,6 +51,25 @@
       </ul>
   {% else %}
       <p><em>No courses depend on {{ code }}.</em></p>
+  {% endif %}
+
+  {% if already_unlocked %}
+  <!-- this is really hard to understand so we need to fix it in a UI update -->
+      <p><strong>Classes already unlocked by courses taken:</strong> {{ already_unlocked|length }}</p>
+      <ul>
+          {% for course in already_unlocked %}
+              <li>
+                  <span class="tooltip">
+                      {{ course }}
+                      <div class="tooltip-box">
+                          <strong>Course Title</strong><br>
+                          X credits<br>
+                          Course description
+                      </div>
+                  </span>
+              </li>
+          {% endfor %}
+      </ul>
   {% endif %}
 </body>
 </html>
