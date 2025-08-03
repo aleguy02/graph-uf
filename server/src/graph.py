@@ -6,7 +6,7 @@ from collections import deque
 
 class Graph:
     def __init__(self):
-        self.adj_list: dict[str, dict[str, set[str]]] = {}
+        self.adj_list: dict[str, dict[str, set[str]]] = {} # adj_list stores: {  COURSE_CODE: { UNLOCKED_COURSE: [ SEMESTERS... ] }  }
 
     def insertEdge(self, from_: str, to_: str, semester: str):  # `from` keyword is reserved in python
         from_ = from_.upper()
@@ -19,7 +19,7 @@ class Graph:
 
         self.adj_list[from_].setdefault(to_, set()).add(semester)
 
-    def getAdjList(self) -> dict[str, dict[str, set[str]]]:
+    def getAdjList(self):
         return self.adj_list
 
     def postreqs(self, root: str, semester: str):

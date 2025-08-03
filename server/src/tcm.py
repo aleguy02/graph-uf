@@ -16,7 +16,7 @@ class TCM:
     def from_graph(cls, g: Graph, semesters: list[str]) -> "TCM":
         closure: dict[str, dict[str, set[str]]] = {}
         for sem in semesters:
-            sem_closure = {} #dict[str, dict[str, set[str]]]
+            sem_closure: dict[str, set[str]] = {}
             for course in g.getAdjList():
                 sem_closure[course] = g.postreqs(course, sem)
             closure[sem] = sem_closure
