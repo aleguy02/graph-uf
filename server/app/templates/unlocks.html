@@ -2,12 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>{{ title }}</title>
-  <style>
-    body { font-family: sans-serif; max-width: 40rem; margin: 2rem auto; }
-    ul { padding-left: 1.25rem; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
 </head>
 <body>
   {% include 'nav_header.html' %}
@@ -37,7 +32,16 @@
       <p><strong>Total:</strong> {{ unlocked|length }}</p>
       <ul>
           {% for course in unlocked %}
-              <li>{{ course }}</li>
+              <li>
+                  <span class="tooltip">
+                      {{ course }}
+                      <div class="tooltip-box">
+                          <strong>Course Title</strong><br>
+                          X credits<br>
+                          Course description
+                      </div>
+                  </span>
+              </li>
           {% endfor %}
       </ul>
   {% else %}
