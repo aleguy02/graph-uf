@@ -46,7 +46,6 @@ semesters = [
 _JSON_PATHS = [Path(__file__).parent / "json" / f"soc_cleaned_{s}.json" for s in semesters]
 _COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}[A-Z]?\b")
 
-
 def _extract_codes(s: str):
     s = s.split("Coreq")[0]  # we don't care about corequisites
     return (c.replace(" ", "") for c in _COURSE_RE.findall(s or ""))
@@ -71,3 +70,30 @@ def build_tcm() -> TCM:
     tcm = TCM.from_graph(graph, semesters)
     return tcm
 
+def build_tooltip():
+    tooltip = {}
+
+    for sem, fp in zip(semesters, _JSON_PATHS):
+        if not fp.exists():
+            continue
+
+        data = json.loads(fp.read_text(encoding="utf-8"))
+
+        tooltip[sem] = {}
+        for c in data["courses"]:
+
+            code = c.get("code", "").strip().upper()
+            name = c.get("name", "")
+            description = c.get("description", "").replace("\n", " ")
+            if not description:
+                description = "No description given"
+            sections = c.get("sections", [])
+            credits = sections[0].get("credits", "") if sections else ""
+
+            tooltip[sem][code] = {
+                "name": name,
+                "description": description,
+                "credits": credits
+                }
+
+    return tooltip
