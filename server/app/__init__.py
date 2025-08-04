@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from app.routes.main import main_bp
 from app.routes.api import api_bp
 from pathlib import Path
-from src.loader import build_graph, build_tcm, semesters
+from src.loader import build_graph, build_tcm, build_tooltip, semesters
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -10,6 +10,7 @@ def create_app(test_config=None):
     try:
         app.config["COURSE_GRAPH"] = build_graph()
         app.config["COURSE_TCM"] = build_tcm()
+        app.config["TOOLTIP_INFO"] = build_tooltip()
         app.config["SEMESTERS"] = semesters
         app.config["DEFAULT_SEMESTER"] = semesters[-1]
     except Exception as e:
