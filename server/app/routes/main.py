@@ -57,7 +57,7 @@ def unlocks_redirect():
     completed = []
     for i in range(1, config.MAX_COURSES_TAKEN + 1):
         raw = request.form.get(f"code{i}", "")
-        if not raw and i != 1:  # minimum of 1 course is required
+        if not raw:
             continue
 
         base = normalise(raw)
@@ -81,35 +81,36 @@ def unlocks_page(code: str):
     if not base:
         abort(404, "Bad course code")
 
-    completed = request.args.get("completed", "").split(",")
-    if not completed or completed == ['']:
-        abort(404, "Bad completed paramater")
+    completed_raw = request.args.get("completed", "")
+    completed = completed_raw.split(",") if completed_raw else []
 
     sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     view = request.args.get("view_type", "")
     if view != "tcm" and view != "graph":
         abort(404, "Bad view type")
 
-    graph = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
+    struct = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
     
-    # TODO: add tests to make sure that the right graph class is being assigned to graph. For now, uncomment this line to check
-    # print(type(graph).__name__)
-
     try:
-        unlocked = graph.postreqs(base, sem)  #all downstream courses
+        unlocked = struct.postreqs(base, sem)  #all downstream courses
     except ValueError:
         abort(404, f"{base} not found in catalog")
     
+    graph = current_app.config["COURSE_GRAPH"]
     prev_unlocked = set()
-    for c in completed:
+    for c in completed:  # this section is a good candidate for future optimization/refactoring but it works
         try:
-            unlocked_by_c = graph.postreqs(c, sem)
-            prev_unlocked.update(unlocked_by_c)
-        except ValueError:
+            neighbors = graph.getAdjList()[c]
+            for neighbor, sems_available in neighbors.items():
+                if sem in sems_available:
+                    prev_unlocked.add(neighbor)
+        except KeyError:
             abort(404, f"{c} not found in catalog")
+    
 
     # Courses unlocked by 'base' that are not already unlocked by completed courses
     new_unlocked = sorted(unlocked.difference(prev_unlocked))
+    
     # Courses unlocked by 'base' that are also unlocked by completed courses
     already_unlocked = sorted(unlocked.intersection(prev_unlocked))
 
