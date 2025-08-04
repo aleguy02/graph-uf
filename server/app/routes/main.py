@@ -121,5 +121,5 @@ def unlocks_page(code: str):
                            already_unlocked=already_unlocked,
                            semesters=current_app.config["SEMESTERS"],
                            selected_semester=sem,
-                           tooltip_info=current_app.config["TOOLTIP_INFO"][sem]
+                           tooltip_info=current_app.config["TOOLTIP_INFO"].get(sem, {})
                            )
