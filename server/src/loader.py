@@ -87,7 +87,8 @@ def build_tooltip():
             description = c.get("description", "").replace("\n", " ")
             if not description:
                 description = "No description given"
-            credits = c.get("sections")[0].get("credits", "")
+            sections = c.get("sections", [])
+            credits = sections[0].get("credits", "") if sections else ""
 
             tooltip[sem][code] = {
                 "name": name,
