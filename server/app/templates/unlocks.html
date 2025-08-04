@@ -41,9 +41,9 @@
                   <span class="tooltip">
                       {{ course }}
                       <div class="tooltip-box">
-                          <strong>{{ tooltip_info[course]['name'] }}</strong><br>
-                          {{ tooltip_info[course]['credits'] }}<br>
-                          {{ tooltip_info[course]['description'] }}
+                          <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
+                          {{ tooltip_info.get(course, {}).get('credits', 'Unknown credits') }}<br>
+                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}
                       </div>
                   </span>
               </li>
