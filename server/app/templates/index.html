@@ -29,7 +29,7 @@
     <label for="code1">Courses completed:</label><br />
     <div id="course-inputs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
       {% for i in range(1, 6) %}
-        <input id="code{{ i }}" name="code{{ i }}" {% if i == 1 %}required{% endif %} placeholder="Course code {{ i }}" />
+        <input id="code{{ i }}" name="code{{ i }}" placeholder="Course code {{ i }}" />
       {% endfor %}
     </div>
     <button type="button" id="add-courses-btn">[+]</button>
