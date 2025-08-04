@@ -100,10 +100,8 @@ def unlocks_page(code: str):
     prev_unlocked = set()
     for c in completed:  # this section is a good candidate for future optimization/refactoring but it works
         try:
-            neighbors = graph.getAdjList()[c]
-            for neighbor, sems_available in neighbors.items():
-                if sem in sems_available:
-                    prev_unlocked.add(neighbor)
+            direct_postreqs = graph.getDirectPostreqs(c, sem)
+            prev_unlocked.update(direct_postreqs)
         except KeyError:
             abort(404, f"{c} not found in catalog")
     

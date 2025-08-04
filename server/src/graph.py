@@ -48,3 +48,13 @@ class Graph:
 
         v.remove(root)
         return v
+    
+    def getDirectPostreqs(self, course: str, semester: str) -> set[str]:
+        res = set()
+        neighbors = self.adj_list[course]
+
+        for neighbor, sems_available in neighbors.items():
+            if semester in sems_available:
+                res.add(neighbor)
+        
+        return res
