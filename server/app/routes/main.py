@@ -48,7 +48,7 @@ def index():
 
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
-    raw = request.form.get(f"tentative-code", "")
+    raw = request.form.get("tentative-code", "")
     code = normalise(raw)
     if not code:
         return redirect(url_for("main.index"))

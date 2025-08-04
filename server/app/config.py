@@ -21,9 +21,6 @@ class Config:
         if not Config.URL:
             missing_vars.append("URL")
 
-        if not Config.MAX_COURSES_TAKEN:
-            missing_vars.append("MAX_COURSES_TAKEN")
-
         if missing_vars:
             raise ValueError(
                 f"Missing environment variables: {', '.join(missing_vars)}"
