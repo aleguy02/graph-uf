@@ -12,6 +12,7 @@ class Config:
 
     # Load environment variables
     URL = os.getenv("URL")
+    MAX_COURSES_TAKEN = 50
 
     @staticmethod
     def validate_env_vars():

@@ -22,7 +22,7 @@ class Graph:
     def getAdjList(self):
         return self.adj_list
 
-    def postreqs(self, root: str, semester: str):
+    def postreqs(self, root: str, semester: str) -> set[str]:
         """
         BFS traversal from root to all reachable nodes.
         Returns all classes that require root as in their prerequisite chain
@@ -48,3 +48,13 @@ class Graph:
 
         v.remove(root)
         return v
+    
+    def getDirectPostreqs(self, course: str, semester: str) -> set[str]:
+        res = set()
+        neighbors = self.adj_list[course]
+
+        for neighbor, sems_available in neighbors.items():
+            if semester in sems_available:
+                res.add(neighbor)
+        
+        return res

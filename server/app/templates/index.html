@@ -23,18 +23,70 @@
 
   <h1>{{ title }}</h1>
   <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
-    <label for="code">Course code:</label><br />
-    <input id="code" name="code" required /><br /><br />
-      <label for="semester">Semester:</label><br />
-      <select id="semester" name="semester">
-          {% for sem in semesters %}
-              <option
-                      value="{{ sem }}"
-                      {% if sem == default_semester %}selected{% endif %}>
-                  {{ sem|upper }}
-              </option>
-          {% endfor %}
-      </select><br /><br />
+    <label for="tentative-code">Tentative course:</label><br />
+    <input id="tentative-code" name="tentative-code" required><br /><br />
+    <!-- Cap at arbitrary number of courses -->
+    <label for="code1">Courses completed:</label><br />
+    <div id="course-inputs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+      {% for i in range(1, 6) %}
+        <input id="code{{ i }}" name="code{{ i }}" placeholder="Course code {{ i }}" />
+      {% endfor %}
+    </div>
+    <button type="button" id="add-courses-btn">[+]</button>
+    <button type="button" id="rm-courses-btn">[-]</button>
+    <script>
+      const maxCourses = {{ max_courses_taken }};  // ignore the red squiggles, this works fine
+      const minCourses = 5;
+      const step = 5;
+      const courseInputsDiv = document.getElementById('course-inputs');
+      const addBtn = document.getElementById('add-courses-btn');
+      const rmBtn = document.getElementById('rm-courses-btn');
+
+      addBtn.addEventListener('click', function() {
+        const currentCount = courseInputsDiv.querySelectorAll('input').length;
+        if (currentCount >= maxCourses) return;
+        const nextCount = Math.min(currentCount + step, maxCourses);
+        for (let i = currentCount + 1; i <= nextCount; i++) {
+          const input = document.createElement('input');
+          input.id = 'code' + i;
+          input.name = 'code' + i;
+          input.placeholder = 'Course code ' + i;
+          courseInputsDiv.appendChild(input);
+        }
+        if (nextCount === maxCourses) addBtn.disabled = true;
+        if (nextCount > minCourses) rmBtn.disabled = false;
+      });
+
+      rmBtn.addEventListener('click', function() {
+        const currentCount = courseInputsDiv.querySelectorAll('input').length;
+        if (currentCount <= minCourses) return;
+        const removeCount = Math.min(step, currentCount - minCourses);
+        for (let i = 0; i < removeCount; i++) {
+          courseInputsDiv.removeChild(courseInputsDiv.lastElementChild);
+        }
+        if (courseInputsDiv.querySelectorAll('input').length === minCourses) rmBtn.disabled = true;
+        if (courseInputsDiv.querySelectorAll('input').length < maxCourses) addBtn.disabled = false;
+      });
+
+      // Initial state
+      if (courseInputsDiv.querySelectorAll('input').length === minCourses) rmBtn.disabled = true;
+    </script>
+    <br /><br />
+    <label for="semester">Semester:</label><br />
+    <select id="semester" name="semester">
+        {% for sem in semesters %}
+            <option
+                    value="{{ sem }}"
+                    {% if sem == default_semester %}selected{% endif %}>
+                {{ sem|upper }}
+            </option>
+        {% endfor %}
+    </select><br /><br />
+    <label for="view_type">Data Structure:</label><br />
+    <select id="view_type" name="view_type">
+      <option value="tcm">Transative Closure Map</option>
+      <option value="graph">Graph</option>
+    </select><br /><br />
     <button type="submit">Show what it unlocks (what it is a prerequesite for)</button>
   </form>
 </body>
