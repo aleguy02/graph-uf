@@ -38,7 +38,7 @@ def index():
     """
     return render_template(
         "index.html",
-        title="UF Scheduler",
+        title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
         url=config.URL,

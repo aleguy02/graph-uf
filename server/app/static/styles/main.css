@@ -14,22 +14,29 @@ button {
 }
 
 body {
-  background-color: #f5f5f9;
+  background: linear-gradient(135deg, #1c539f 0%, #2c6bc0 50%, #1d539f 100%);
+  background-attachment: fixed;
   background-size: cover;
   width: auto;
   overflow-x: hidden;
   font-family: 'Roboto', serif;
   margin: 0px;
+  min-height: 100vh;
 }
 
-/* Nav Bar styles */
+/* Enhanced Nav Bar styles */
 .nav-bar {
   width: 100%;
   display: inline-block;
-  background-color: #1c539f;
+  background: rgba(28, 83, 159, 0.95);
+  backdrop-filter: blur(10px);
   font-family: 'Roboto', serif;
   font-weight: 700 !important;
   padding-top: 10px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .nav-content {
@@ -58,6 +65,11 @@ body {
 
 .nav-logo img {
   width: 200px;
+  transition: all 0.3s ease;
+}
+
+.nav-logo img:hover {
+  transform: scale(1.05);
 }
 
 .nav-links {
@@ -71,14 +83,215 @@ body {
   text-decoration: none;
   font-weight: 500;
   padding: 8px 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
   text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Enhanced Content Container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Main Card */
+.main-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 2rem;
+}
+
+/* Form Section Styling */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  color: #1d539f;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.form-section h3 i {
+  color: #1c539f;
+  font-size: 1.2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced Form Inputs */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #1d539f;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+  font-family: 'Roboto', serif;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #1c539f;
+  box-shadow: 0 0 0 3px rgba(28, 83, 159, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Course Inputs Grid */
+#course-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.course-input {
+  position: relative;
+}
+
+.course-input input {
+  padding-left: 2.5rem;
+}
+
+.course-input::before {
+  content: '📚';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  font-size: 1.1rem;
+}
+
+/* Enhanced Button Controls */
+.course-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn-control {
+  background: #1c539f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: 'Roboto', serif;
+}
+
+.btn-control:hover {
+  background: #1d539f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(28, 83, 159, 0.3);
+}
+
+.btn-control:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Enhanced Submit Button */
+.submit-btn {
+  background: linear-gradient(135deg, #1c539f 0%, #2c6bc0 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Roboto', serif;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(28, 83, 159, 0.3);
+}
+
+/* Info Box */
+.info-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  border: 1px solid rgba(28, 83, 159, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-box h4 {
+  color: #1c539f;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.info-box p {
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
 }
 
 /* Hamburger Menu Styles */
@@ -92,12 +305,13 @@ body {
   border: none;
   cursor: pointer;
   padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .hamburger-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
 }
 
 .hamburger-button img {
@@ -109,10 +323,11 @@ body {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #1c539f;
+  background: rgba(28, 83, 159, 0.95);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   min-width: 150px;
   opacity: 0;
   visibility: hidden;
@@ -133,21 +348,21 @@ body {
   text-decoration: none;
   padding: 12px 16px;
   font-weight: 500;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .mobile-nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
   text-decoration: none;
 }
 
 .mobile-nav-link:first-child {
-  border-radius: 8px 8px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .mobile-nav-link:last-child {
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 12px 12px;
 }
 
 .nav-content nav {
@@ -158,10 +373,11 @@ body {
   padding-right: 0px;
 }
 
+/* Enhanced Banner */
 .banner {
   padding: 20px 0px 50px 0px;
   height: 150px;
-  background-color: #1d539f;
+  background: linear-gradient(135deg, #1d539f 0%, #2c6bc0 100%);
 }
 
 .banner .logo {
@@ -175,6 +391,7 @@ body {
   color: white;
   font-size: 50px;
   font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .section {
@@ -192,9 +409,9 @@ ul {
   padding-left: 1.2rem;
 }
 
-/* Button Styles */
+/* Enhanced Button Styles */
 .btn {
-  background-color: #1c539f;
+  background: linear-gradient(135deg, #1c539f 0%, #2c6bc0 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -206,23 +423,22 @@ ul {
   text-decoration: none;
   display: inline-block;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(28, 83, 159, 0.2);
 }
 
 .btn:hover {
-  background-color: #1d539f;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 15px rgba(28, 83, 159, 0.3);
   color: white;
   text-decoration: none;
 }
 
 .btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(28, 83, 159, 0.2);
 }
 
-/* Error page specific styles */
+/* Enhanced Error page styles */
 .error-container {
   display: flex;
   flex-direction: column;
@@ -234,23 +450,25 @@ ul {
 }
 
 .error-container h1 {
-  color: #1d539f;
+  color: white;
   font-size: 2.5rem;
   margin-bottom: 2rem;
   font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Form Container Styles */
+/* Enhanced Form Container Styles */
 #form-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-  border: 1px solid rgba(28, 83, 159, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #form-container h2 {
@@ -270,7 +488,7 @@ ul {
   display: none;
 }
 
-/*tooltip for course hover*/
+/* Enhanced tooltip for course hover */
 .tooltip {
   position: relative;
   display: inline-block;
@@ -280,7 +498,7 @@ ul {
 .tooltip .tooltip-box {
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
 
   position: absolute;
   left: 100%;
@@ -288,12 +506,14 @@ ul {
   transform: translateY(-50%) translateX(0.75rem);
   margin-bottom: 0.5rem;
   width: 16rem;
-  background: #333;
+  background: rgba(51, 51, 51, 0.95);
+  backdrop-filter: blur(10px);
   color: #fff;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 8px;
   text-align: left;
   z-index: 10;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .tooltip .tooltip-box::after {
@@ -304,14 +524,32 @@ ul {
   transform: translateY(-50%);
   border-width: 0.25rem;
   border-style: solid;
-  border-color: transparent #333 transparent transparent;
+  border-color: transparent rgba(51, 51, 51, 0.95) transparent transparent;
 }
 
 .tooltip:hover .tooltip-box {
   visibility: visible;
   opacity: 1;
+  transform: translateY(-50%) translateX(0.75rem) scale(1.02);
 }
 
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
   .responsive-text-lg {
     display: none;
@@ -336,5 +574,37 @@ ul {
 
   .nav-logo img {
     width: 150px;
+  }
+
+  /* Mobile content adjustments */
+  .container {
+    padding: 1rem;
+  }
+
+  .main-card {
+    padding: 2rem;
+    border-radius: 15px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  #course-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .course-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn-control {
+    width: 100%;
+    justify-content: center;
   }
 }

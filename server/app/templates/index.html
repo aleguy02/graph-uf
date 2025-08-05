@@ -9,9 +9,8 @@
   <meta property="og:url" content="{{ url }}" />
 
   <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon" />
@@ -21,73 +20,160 @@
 <body>
   {% include 'nav_header.html' %}
 
-  <h1>{{ title }}</h1>
-  <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
-    <label for="tentative-code">Tentative course:</label><br />
-    <input id="tentative-code" name="tentative-code" required><br /><br />
-    <!-- Cap at arbitrary number of courses -->
-    <label for="code1">Courses completed:</label><br />
-    <div id="course-inputs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-      {% for i in range(1, 6) %}
-        <input id="code{{ i }}" name="code{{ i }}" placeholder="Course code {{ i }}" />
-      {% endfor %}
+  <div class="container">
+    <div class="hero-section fade-in">
+      <h1 class="hero-title">{{ title }}</h1>
+      <p class="hero-subtitle">Discover which courses you can unlock by completing your target course</p>
     </div>
-    <button type="button" id="add-courses-btn">[+]</button>
-    <button type="button" id="rm-courses-btn">[-]</button>
-    <script>
-      const maxCourses = {{ max_courses_taken }};  // ignore the red squiggles, this works fine
-      const minCourses = 5;
-      const step = 5;
-      const courseInputsDiv = document.getElementById('course-inputs');
-      const addBtn = document.getElementById('add-courses-btn');
-      const rmBtn = document.getElementById('rm-courses-btn');
 
-      addBtn.addEventListener('click', function() {
-        const currentCount = courseInputsDiv.querySelectorAll('input').length;
-        if (currentCount >= maxCourses) return;
-        const nextCount = Math.min(currentCount + step, maxCourses);
-        for (let i = currentCount + 1; i <= nextCount; i++) {
-          const input = document.createElement('input');
-          input.id = 'code' + i;
-          input.name = 'code' + i;
-          input.placeholder = 'Course code ' + i;
-          courseInputsDiv.appendChild(input);
-        }
-        if (nextCount === maxCourses) addBtn.disabled = true;
-        if (nextCount > minCourses) rmBtn.disabled = false;
+    <div class="main-card fade-in">
+      <div class="info-box">
+        <h4><i class="fas fa-info-circle"></i>How it works</h4>
+        <p>Enter a course you're considering taking, along with courses you've already completed, to see what new opportunities it unlocks for your academic journey.</p>
+      </div>
+
+      <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
+        <div class="form-section">
+          <h3><i class="fas fa-target"></i>Target Course</h3>
+          <div class="form-group">
+            <label for="tentative-code">Course you're considering:</label>
+            <input id="tentative-code" name="tentative-code" required placeholder="e.g., COP3530, MAC2311, CHM2045">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3><i class="fas fa-check-circle"></i>Completed Courses</h3>
+          <div class="form-group">
+            <label for="code1">Courses you've already completed:</label>
+            <div id="course-inputs">
+              {% for i in range(1, 6) %}
+                <div class="course-input">
+                  <input id="code{{ i }}" name="code{{ i }}" placeholder="Course code {{ i }}" />
+                </div>
+              {% endfor %}
+            </div>
+            <div class="course-controls">
+              <button type="button" id="add-courses-btn" class="btn-control">
+                <i class="fas fa-plus"></i> Add More
+              </button>
+              <button type="button" id="rm-courses-btn" class="btn-control">
+                <i class="fas fa-minus"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3><i class="fas fa-calendar-alt"></i>Semester & View Options</h3>
+          <div class="form-group">
+            <label for="semester">Semester:</label>
+            <select id="semester" name="semester">
+              {% for sem in semesters %}
+                <option value="{{ sem }}" {% if sem == default_semester %}selected{% endif %}>
+                  {{ sem|upper }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="view_type">Data Structure:</label>
+            <select id="view_type" name="view_type">
+              <option value="tcm">Transitive Closure Map</option>
+              <option value="graph">Interactive Graph</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-unlock"></i>
+          Show what it unlocks (what it is a prerequisite for)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const maxCourses = {{ max_courses_taken }};  // Your existing Flask variable
+    const minCourses = 5;
+    const step = 5;
+    const courseInputsDiv = document.getElementById('course-inputs');
+    const addBtn = document.getElementById('add-courses-btn');
+    const rmBtn = document.getElementById('rm-courses-btn');
+
+    function createCourseInput(index) {
+      const div = document.createElement('div');
+      div.className = 'course-input';
+      
+      const input = document.createElement('input');
+      input.id = 'code' + index;
+      input.name = 'code' + index;
+      input.placeholder = 'Course code ' + index;
+      
+      div.appendChild(input);
+      return div;
+    }
+
+    addBtn.addEventListener('click', function() {
+      const currentCount = courseInputsDiv.querySelectorAll('input').length;
+      if (currentCount >= maxCourses) return;
+      
+      const nextCount = Math.min(currentCount + step, maxCourses);
+      for (let i = currentCount + 1; i <= nextCount; i++) {
+        const courseInputDiv = createCourseInput(i);
+        courseInputsDiv.appendChild(courseInputDiv);
+      }
+      
+      updateButtonStates();
+    });
+
+    rmBtn.addEventListener('click', function() {
+      const currentCount = courseInputsDiv.querySelectorAll('input').length;
+      if (currentCount <= minCourses) return;
+      
+      const removeCount = Math.min(step, currentCount - minCourses);
+      for (let i = 0; i < removeCount; i++) {
+        courseInputsDiv.removeChild(courseInputsDiv.lastElementChild);
+      }
+      
+      updateButtonStates();
+    });
+
+    function updateButtonStates() {
+      const currentCount = courseInputsDiv.querySelectorAll('input').length;
+      rmBtn.disabled = currentCount <= minCourses;
+      addBtn.disabled = currentCount >= maxCourses;
+    }
+
+    // Initial state
+    updateButtonStates();
+
+    // Add smooth animations to form interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
       });
+    });
 
-      rmBtn.addEventListener('click', function() {
-        const currentCount = courseInputsDiv.querySelectorAll('input').length;
-        if (currentCount <= minCourses) return;
-        const removeCount = Math.min(step, currentCount - minCourses);
-        for (let i = 0; i < removeCount; i++) {
-          courseInputsDiv.removeChild(courseInputsDiv.lastElementChild);
-        }
-        if (courseInputsDiv.querySelectorAll('input').length === minCourses) rmBtn.disabled = true;
-        if (courseInputsDiv.querySelectorAll('input').length < maxCourses) addBtn.disabled = false;
-      });
-
-      // Initial state
-      if (courseInputsDiv.querySelectorAll('input').length === minCourses) rmBtn.disabled = true;
-    </script>
-    <br /><br />
-    <label for="semester">Semester:</label><br />
-    <select id="semester" name="semester">
-        {% for sem in semesters %}
-            <option
-                    value="{{ sem }}"
-                    {% if sem == default_semester %}selected{% endif %}>
-                {{ sem|upper }}
-            </option>
-        {% endfor %}
-    </select><br /><br />
-    <label for="view_type">Data Structure:</label><br />
-    <select id="view_type" name="view_type">
-      <option value="tcm">Transative Closure Map</option>
-      <option value="graph">Graph</option>
-    </select><br /><br />
-    <button type="submit">Show what it unlocks (what it is a prerequesite for)</button>
-  </form>
+    // Form validation feedback
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const tentativeCode = document.getElementById('tentative-code').value.trim();
+      if (!tentativeCode) {
+        e.preventDefault();
+        document.getElementById('tentative-code').focus();
+        document.getElementById('tentative-code').style.borderColor = '#e74c3c';
+        setTimeout(() => {
+          document.getElementById('tentative-code').style.borderColor = '#e1e5e9';
+        }, 3000);
+      }
+    });
+  </script>
 </body>
 </html>
