@@ -27,7 +27,7 @@
       </select><br /><br />
         <label for="view_type">Data Structure:</label><br />
         <select id="view_type" name="view_type">
-        <option value="tcm">Transative Closure Map</option>
+        <option value="tcm">Transitive Closure Map</option>
         <option value="graph">Graph</option>
         </select><br /><br />
       <button type="submit">Switch</button>
@@ -41,9 +41,9 @@
                   <span class="tooltip">
                       {{ course }}
                       <div class="tooltip-box">
-                          <strong>Course Title</strong><br>
-                          X credits<br>
-                          Course description
+                          <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
+                          {{ tooltip_info.get(course, {}).get('credits', 'Unknown credits') }}<br>
+                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}
                       </div>
                   </span>
               </li>
@@ -62,9 +62,9 @@
                   <span class="tooltip">
                       {{ course }}
                       <div class="tooltip-box">
-                          <strong>Course Title</strong><br>
-                          X credits<br>
-                          Course description
+                          <strong>{{ tooltip_info[course]['name'] }}</strong><br>
+                          {{ tooltip_info[course]['credits'] }}<br>
+                          {{ tooltip_info[course]['description'] }}
                       </div>
                   </span>
               </li>
