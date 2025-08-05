@@ -33,29 +33,9 @@
       <button type="submit">Switch</button>
   </form>
 
-  {% if new_unlocked %}
-      <p><strong>These are classes for which {{ code }} is a prerequisite and for which you do not yet meet any other prerequisites. They may be less interesting to you</strong> {{ new_unlocked|length }}</p>
-      <ul>
-          {% for course in new_unlocked %}
-              <li>
-                  <span class="tooltip" style="color: white;">
-                      {{ course }}
-                      <div class="tooltip-box">
-                          <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
-                          {{ tooltip_info.get(course, {}).get('credits', 'Unknown credits') }}<br>
-                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}
-                      </div>
-                  </span>
-              </li>
-          {% endfor %}
-      </ul>
-  {% else %}
-      <p><em>No courses depend on {{ code }}.</em></p>
-  {% endif %}
-
   {% if already_unlocked %}
   <!-- this is really hard to understand so we need to fix it in a UI update -->
-      <p><strong>These are classes for which {{ code }}is a prerequisite and for which you already meet some of the other prerequisites. They may be more interesting to you:</strong> {{ already_unlocked|length }}</p>
+      <p><strong>{{ already_unlocked|length }} classes found for which {{ code }} is a prerequisite and for which you already meet some of the other prerequisites. These are more immediately available and may be more interesting to you:</strong></p>
       <ul>
           {% for course in already_unlocked %}
               <li>
@@ -64,12 +44,34 @@
                       <div class="tooltip-box">
                           <strong>{{ tooltip_info[course]['name'] }}</strong><br>
                           {{ tooltip_info[course]['credits'] }}<br>
-                          {{ tooltip_info[course]['description'] }}
+                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
+                          {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
                       </div>
                   </span>
               </li>
           {% endfor %}
       </ul>
+  {% endif %}
+
+  {% if new_unlocked %}
+      <p><strong>{{ new_unlocked|length }} classes found for which {{ code }} is a chain prerequisite and for which you do not yet meet any other prerequisites. These may be less interesting to you:</strong></p>
+      <ul>
+          {% for course in new_unlocked %}
+              <li>
+                  <span class="tooltip" style="color: white;">
+                      {{ course }}
+                      <div class="tooltip-box">
+                          <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
+                          {{ tooltip_info.get(course, {}).get('credits', 'Unknown credits') }}<br>
+                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
+                          {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
+                      </div>
+                  </span>
+              </li>
+          {% endfor %}
+      </ul>
+  {% else %}
+      <p><em>No courses depend on {{ code }}.</em></p>
   {% endif %}
 </body>
 </html>
