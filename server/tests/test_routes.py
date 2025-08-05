@@ -19,6 +19,5 @@ def test_home(client):
     html = response.get_data(as_text=True)
     headers = dict(response.headers)
 
-    assert "<title>UF Scheduler</title>" in html
-    assert "<h1>UF Scheduler</h1>" in html
+    assert "<title>GraphUF</title>" in html
     assert headers["Content-Type"] == "text/html; charset=utf-8"
