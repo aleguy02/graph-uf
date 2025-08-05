@@ -15,6 +15,7 @@ instance/
 .envrc
 .venv
 .myenv
+myenv/
 env/
 venv/
 ENV/
@@ -39,3 +40,6 @@ cython_debug/
 
 # scrape data
 server/src/json/*.json
+
+# pytest
+.pytest_cache
