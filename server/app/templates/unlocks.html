@@ -15,7 +15,7 @@
   <form
           method="get"
           action="{{ url_for('main.unlocks_page', code=code) }}">
-      <label for="semester-select">Semester:</label>
+    <label for="semester-select" style="color: white;">Semester:</label>
       <select id="semester-select" name="semester">
           {% for sem in semesters %}
               <option
@@ -25,7 +25,7 @@
               </option>
           {% endfor %}
       </select><br /><br />
-        <label for="view_type">Data Structure:</label><br />
+        <label for="view_type" style="color: white;">Data Structure:</label><br />
         <select id="view_type" name="view_type">
         <option value="tcm">Transitive Closure Map</option>
         <option value="graph">Graph</option>
@@ -34,11 +34,11 @@
   </form>
 
   {% if new_unlocked %}
-      <p><strong>Classes newly unlocked by {{ code }}:</strong> {{ new_unlocked|length }}</p>
+      <p><strong>These are classes for which {{ code }} is a prerequisite and for which you do not yet meet any other prerequisites. They may be less interesting to you</strong> {{ new_unlocked|length }}</p>
       <ul>
           {% for course in new_unlocked %}
               <li>
-                  <span class="tooltip">
+                  <span class="tooltip" style="color: white;">
                       {{ course }}
                       <div class="tooltip-box">
                           <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
@@ -55,11 +55,11 @@
 
   {% if already_unlocked %}
   <!-- this is really hard to understand so we need to fix it in a UI update -->
-      <p><strong>Classes already unlocked by courses taken:</strong> {{ already_unlocked|length }}</p>
+      <p><strong>These are classes for which {{ code }}is a prerequisite and for which you already meet some of the other prerequisites. They may be more interesting to you:</strong> {{ already_unlocked|length }}</p>
       <ul>
           {% for course in already_unlocked %}
               <li>
-                  <span class="tooltip">
+                  <span class="tooltip" style="color: white;">
                       {{ course }}
                       <div class="tooltip-box">
                           <strong>{{ tooltip_info[course]['name'] }}</strong><br>
