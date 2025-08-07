@@ -33,11 +33,11 @@
       <button type="submit">Switch</button>
   </form>
 
-  {% if already_unlocked %}
+  {% if meet_prereqs %}
   <!-- this is really hard to understand so we need to fix it in a UI update -->
-      <p><strong>{{ already_unlocked|length }} classes found for which {{ code }} is a prerequisite and for which you already meet some of the other prerequisites. These are more immediately available and may be more interesting to you:</strong></p>
+      <p><strong>{{ meet_prereqs|length }} classes found for which {{ code }} is a chain prerequisite and for which you already meet some of the other prerequisites outside of {{ code }} or {{ code }} is the only prerequisite. These are more immediately available and may be more interesting to you:</strong></p>
       <ul>
-          {% for course in already_unlocked %}
+          {% for course in meet_prereqs %}
               <li>
                   <span class="tooltip" style="color: white;">
                       {{ course }}
@@ -53,10 +53,10 @@
       </ul>
   {% endif %}
 
-  {% if new_unlocked %}
-      <p><strong>{{ new_unlocked|length }} classes found for which {{ code }} is a chain prerequisite and for which you do not yet meet any other prerequisites. These may be less interesting to you:</strong></p>
+  {% if not_meet_prereqs %}
+      <p><strong>{{ not_meet_prereqs|length }} classes found for which {{ code }} is a chain prerequisite and for which you do not yet meet any other prerequisites outside of {{ code }}. These may be less interesting to you:</strong></p>
       <ul>
-          {% for course in new_unlocked %}
+          {% for course in not_meet_prereqs %}
               <li>
                   <span class="tooltip" style="color: white;">
                       {{ course }}
