@@ -71,11 +71,15 @@
         <div class="form-section">
           <div class="form-group">
             <label for="semester-select">Semester:</label>
-            <select id="semester-select" name="semester">
-              {% for sem in semesters %}
-                <option value="{{ sem }}" {% if sem == selected_semester %}selected{% endif %}>{{ sem|upper }}</option>
-              {% endfor %}
-            </select>
+            <label for="semester-select">Semester:</label>
+              <select id="semester-select" name="semester">
+                  {% for sem in semesters %}
+                      <option value="{{ sem }}" {% if sem == selected_semester %}selected{% endif %}>
+                          {{ sem | semester_label }}
+                      </option>
+                  {% endfor %}
+              </select>
+
           </div>
 
           <div class="form-group">

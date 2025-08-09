@@ -58,11 +58,11 @@
           <div class="form-group">
             <label for="semester">Semester:</label>
             <select id="semester" name="semester">
-              {% for sem in semesters %}
-                <option value="{{ sem }}" {% if sem == default_semester %}selected{% endif %}>
-                  {{ sem|upper }}
-                </option>
-              {% endfor %}
+                {% for sem in semesters %}
+                    <option value="{{ sem }}" {% if sem == default_semester %}selected{% endif %}>
+                        {{ sem | semester_label }}
+                    </option>
+                {% endfor %}
             </select>
           </div>
 
