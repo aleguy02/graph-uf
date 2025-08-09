@@ -121,7 +121,7 @@ def unlocks_page(code: str):
     
 
     return render_template("unlocks.html",
-                           title=f"{base} unlocks…",
+                           title=f"{base} unlocks",
                            code=base,
                            not_meet_prereqs=sorted(not_meet_prereqs),
                            meet_prereqs=sorted(meet_prereqs),

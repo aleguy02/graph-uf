@@ -1,10 +1,12 @@
 <header class="nav-bar">
-  <div class="nav-content">
-    <a href="{{ url_for('main.index') }}" class="nav-logo">
+    <a href="{{ url_for('main.index') }}" class="nav-logo nav-link">
       <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="GraphUF" />
+      <h1>GraphUF</h1>
     </a>
-    <nav class="nav-links">
-        <a href="{{ url_for('main.index') }}" class="nav-link nav-back">Home</a>
-    </nav>
-  </div>
+    <div class="nav-links">
+        <a href="https://github.com/aleguy02/COP3530-project3" class="nav-link text-bold">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+    </div>
 </header>
