@@ -23,4 +23,8 @@ class TCM:
         return cls(closure)
 
     def postreqs(self, code: str, semester: str) -> set[str]:
-        return self._map.get(semester, {}).get(code.upper(), set())
+        semester_map = self._map.get(semester, {})
+        if code.upper() not in semester_map:
+            raise ValueError(f"Course code '{code}' not found")
+        
+        return semester_map[code.upper()]

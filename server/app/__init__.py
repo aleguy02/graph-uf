@@ -25,7 +25,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(404)
     def not_found(e):
-        return render_template("404.html", title="Not Found"), 404
+        return render_template("404.html", title="GraphUF"), 404
 
     return app
 

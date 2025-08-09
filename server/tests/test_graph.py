@@ -5,6 +5,7 @@ Run this test with `python -m pytest tests/test_graph.py`
 
 from src.graph import Graph
 import pdb
+import pytest
 
 SEM = "sm25"
 
@@ -81,3 +82,6 @@ def test_postreqs(complex_g):
     expected_postreqs = {"MAC2312", "COT3100", "COP3503", "COP3530"}
     postreqs = complex_g.postreqs(root, SEM)
     assert postreqs == expected_postreqs
+
+    with pytest.raises(ValueError):
+        complex_g.postreqs("NONEXISTENT_COURSE", SEM)

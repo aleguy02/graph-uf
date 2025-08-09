@@ -2,76 +2,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+  {% include 'meta.html' %}
 </head>
 <body>
   {% include 'nav_header.html' %}
 
-  <h1>
-      All courses unlocked by {{ code }}
-      in {{ selected_semester|upper }}
-  </h1>
+  <div class="container">
+    <div class="hero-section">
+      <h1 class="hero-title">Courses unlocked by {{ code }}</h1>
+      <p class="hero-subtitle">{{ selected_semester|upper }}</p>
+    </div>
 
-  <form
-          method="get"
-          action="{{ url_for('main.unlocks_page', code=code) }}">
-    <label for="semester-select" style="color: white;">Semester:</label>
-      <select id="semester-select" name="semester">
-          {% for sem in semesters %}
-              <option
-                      value="{{ sem }}"
-                      {% if sem == selected_semester %}selected{% endif %}>
-                  {{ sem|upper }}
-              </option>
-          {% endfor %}
-      </select><br /><br />
-        <label for="view_type" style="color: white;">Data Structure:</label><br />
-        <select id="view_type" name="view_type">
-        <option value="tcm">Transitive Closure Map</option>
-        <option value="graph">Graph</option>
-        </select><br /><br />
-      <button type="submit">Switch</button>
-  </form>
-
-  {% if already_unlocked %}
-  <!-- this is really hard to understand so we need to fix it in a UI update -->
-      <p><strong>{{ already_unlocked|length }} classes found for which {{ code }} is a prerequisite and for which you already meet some of the other prerequisites. These are more immediately available and may be more interesting to you:</strong></p>
-      <ul>
-          {% for course in already_unlocked %}
+    {% if meet_prereqs %}
+      <div class="main-card">
+        <div class="section">
+          <h2>Available sooner</h2>
+          <p>{{ code }} is a chain prerequisite and you already satisfy at least one other prerequisite, or {{ code }} is the only prerequisite.</p>
+          <ul>
+            {% for course in meet_prereqs %}
               <li>
-                  <span class="tooltip" style="color: white;">
-                      {{ course }}
-                      <div class="tooltip-box">
-                          <strong>{{ tooltip_info[course]['name'] }}</strong><br>
-                          {{ tooltip_info[course]['credits'] }}<br>
-                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
-                          {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
-                      </div>
-                  </span>
+                <span class="tooltip" data-course="{{ course }}" style="color: #1d539f;">
+                  {{ course }}
+                  <div class="tooltip-box">
+                    <strong>{{ tooltip_info[course]['name'] }}</strong><br>
+                    Credits: {{ tooltip_info.get(course, {}).get('credits', '—') }}<br><br>
+                    {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
+                    {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
+                  </div>
+                </span>
               </li>
-          {% endfor %}
-      </ul>
-  {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
 
-  {% if new_unlocked %}
-      <p><strong>{{ new_unlocked|length }} classes found for which {{ code }} is a chain prerequisite and for which you do not yet meet any other prerequisites. These may be less interesting to you:</strong></p>
-      <ul>
-          {% for course in new_unlocked %}
+    <div class="main-card">
+      {% if not_meet_prereqs %}
+        <div class="section">
+          <h2>May require more work</h2>
+          <p>{{ code }} is a chain prerequisite but you don't yet satisfy other prerequisites.</p>
+          <ul>
+            {% for course in not_meet_prereqs %}
               <li>
-                  <span class="tooltip" style="color: white;">
-                      {{ course }}
-                      <div class="tooltip-box">
-                          <strong>{{ tooltip_info.get(course, {}).get('name', 'Unknown Course') }}</strong><br>
-                          {{ tooltip_info.get(course, {}).get('credits', 'Unknown credits') }}<br>
-                          {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
-                          {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
-                      </div>
-                  </span>
+                <span class="tooltip" data-course="{{ course }}" style="color: #1d539f;">
+                  {{ course }}
+                  <div class="tooltip-box">
+                    <strong>{{ tooltip_info[course]['name'] }}</strong><br>
+                    Credits: {{ tooltip_info[course]['credits'] }}<br>
+                    {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
+                    {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
+                  </div>
+                </span>
               </li>
-          {% endfor %}
-      </ul>
-  {% else %}
-      <p><em>No courses depend on {{ code }}.</em></p>
-  {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="section">
+          <p><em>No courses depend on {{ code }}.</em></p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="main-card">
+      <form method="get" action="{{ url_for('main.unlocks_page', code=code) }}" class="form-inline">
+        <input type="hidden" name="completed" value="{{ request.args.get('completed', '') }}" />
+        <div class="form-section">
+          <div class="form-group">
+            <label for="semester-select">Semester:</label>
+            <select id="semester-select" name="semester">
+              {% for sem in semesters %}
+                <option value="{{ sem }}" {% if sem == selected_semester %}selected{% endif %}>{{ sem|upper }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="view_type">Data Structure:</label>
+            <select id="view_type" name="view_type">
+              <option value="tcm" {% if view_type == 'tcm' %}selected{% endif %}>Transitive Closure Map</option>
+              <option value="graph" {% if view_type == 'graph' %}selected{% endif %}>Graph</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn">Update</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const termMap = {"sp": "1", "sm": "5", "f": "8"} 
+
+      const sem = '{{ selected_semester }}'
+      const termID = termMap[sem.slice(0, -2)];
+      const year = sem.slice(-2);
+
+      const base_url = "https://one.uf.edu/soc/"
+      
+      document.querySelectorAll('.tooltip').forEach(function(element) {
+      element.addEventListener('click', function() {
+        const ext = "?course-code=%22" + this.dataset.course.trim() + "%22" + "&category=%22CWSP%22" + "&term=%22" + `2${year}${termID}` + "%22"
+        window.open(base_url + ext, '_blank');
+      });
+      });
+    </script>
+  </div>
 </body>
 </html>

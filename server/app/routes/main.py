@@ -41,7 +41,6 @@ def index():
         title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
-        url=config.URL,
         max_courses_taken=config.MAX_COURSES_TAKEN,
     )
 
@@ -70,7 +69,7 @@ def unlocks_redirect():
     
     view = request.form.get("view_type", "")
     if view != "tcm" and view != "graph":
-        abort(404, "Bad view type")
+        abort(400, "Bad view type")
         
     return redirect(url_for("main.unlocks_page", code=code, completed=_to_CSV(completed), semester=sem, view_type=view))
 
@@ -79,46 +78,52 @@ def unlocks_redirect():
 def unlocks_page(code: str):
     base = normalise(code)
     if not base:
-        abort(404, "Bad course code")
+        abort(400, f"Bad course code: {code}")
 
     completed_raw = request.args.get("completed", "")
-    completed = completed_raw.split(",") if completed_raw else []
+    completed = set(completed_raw.split(",")) if completed_raw else set()
 
     sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     view = request.args.get("view_type", "")
     if view != "tcm" and view != "graph":
-        abort(404, "Bad view type")
+        abort(400, "Bad view type")
 
     struct = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
     
     try:
-        unlocked = struct.postreqs(base, sem)  #all downstream courses
+        unlocked = struct.postreqs(base, sem)  # all downstream courses
     except ValueError:
-        abort(404, f"{base} not found in catalog")
+        abort(400, f"Course not found in catalog: {base}")
     
-    graph = current_app.config["COURSE_GRAPH"]
-    prev_unlocked = set()
-    for c in completed:  # this section is a good candidate for future optimization/refactoring but it works
+    # all courses in unlocks for which you would meet all or some prerequisites or where the only prerequisite is the tentative course
+    meet_prereqs = set()
+    
+    # all courses in unlocks for which you do not meet any other prereqs, excluding tentative course
+    not_meet_prereqs = set()
+
+    for c in unlocked:
+        """
+        Get prerequisites for course c using the same logic as the url_for(api_bp.prereqs()) API route
+        please review this code carefully in code review. It may be wise to opt for an internal API call if we want
+        to use the prereqs API elsewhere in the app. For now, it is more efficient to just duplicate the logic
+        """
+        graph = current_app.config["COURSE_GRAPH"]
         try:
-            direct_postreqs = graph.getDirectPostreqs(c, sem)
-            prev_unlocked.update(direct_postreqs)
-        except KeyError:
-            abort(404, f"{c} not found in catalog")
-    
-
-    # Courses unlocked by 'base' that are not already unlocked by completed courses
-    new_unlocked = sorted(unlocked.difference(prev_unlocked))
-    
-    # Courses unlocked by 'base' that are also unlocked by completed courses
-    already_unlocked = sorted(unlocked.intersection(prev_unlocked))
-
+            adj = graph.getAdjList()
+            c_prereqs = set(src for src, targets in adj.items() if c in targets and sem in targets[c])
+            if (not c_prereqs.isdisjoint(completed) or c_prereqs == {base}):
+                meet_prereqs.add(c)
+            else:
+                not_meet_prereqs.add(c)
+        except (AttributeError, KeyError):
+            abort(400, f"Course not found in catalog: {c}")
     
 
     return render_template("unlocks.html",
-                           title=f"{base} unlocks…",
+                           title=f"{base} unlocks",
                            code=base,
-                           new_unlocked=new_unlocked,
-                           already_unlocked=already_unlocked,
+                           not_meet_prereqs=sorted(not_meet_prereqs),
+                           meet_prereqs=sorted(meet_prereqs),
                            semesters=current_app.config["SEMESTERS"],
                            selected_semester=sem,
                            tooltip_info=current_app.config["TOOLTIP_INFO"].get(sem, {})

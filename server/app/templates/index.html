@@ -2,19 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <meta property="og:title" content="GraphUF" />
-  <meta property="og:description" content="GraphUF" />
-  <meta property="og:url" content="{{ url }}" />
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
-  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon" />
-  <title>{{ title }}</title>
+  {% include 'meta.html' %}
 </head>
 
 <body>
@@ -29,26 +17,27 @@
     <div class="main-card fade-in">
       <div class="info-box">
         <h4><i class="fas fa-info-circle"></i>How it works</h4>
-        <p>Enter a course you're considering taking, along with courses you've already completed, to see what new opportunities it unlocks for your academic journey.</p>
+        <p>Enter a course you're considering or interested in and any you've already completed. We'll show what that course unlocks and whether you already satisfy the other prerequisites.</p>
+        <h4><i class="fas fa-info-circle"></i>Tip</h4>
+        <p>You can also enter a lower-level course you've already taken as a target to open show a wider range of course unlocks!</p>
       </div>
 
       <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
         <div class="form-section">
           <h3><i class="fas fa-target"></i>Target Course</h3>
           <div class="form-group">
-            <label for="tentative-code">Course you're considering:</label>
             <input id="tentative-code" name="tentative-code" required placeholder="e.g., COP3530, MAC2311, CHM2045">
+            <small class="help-text">Use standard course codes.</small>
           </div>
         </div>
 
         <div class="form-section">
-          <h3><i class="fas fa-check-circle"></i>Completed Courses</h3>
+          <h3><i class="fas"></i>Completed Courses</h3>
           <div class="form-group">
-            <label for="code1">Courses you've already completed:</label>
             <div id="course-inputs">
               {% for i in range(1, 6) %}
                 <div class="course-input">
-                  <input id="code{{ i }}" name="code{{ i }}" placeholder="Course code {{ i }}" />
+                  <input id="code{{ i }}" name="code{{ i }}" placeholder="Code {{ i }}" />
                 </div>
               {% endfor %}
             </div>
@@ -60,11 +49,12 @@
                 <i class="fas fa-minus"></i> Remove
               </button>
             </div>
+            <small class="help-text">Add any courses you've successfully completed. This helps us filter what's immediately available.</small>
           </div>
         </div>
 
         <div class="form-section">
-          <h3><i class="fas fa-calendar-alt"></i>Semester & View Options</h3>
+          <h3><i class="fas"></i>Semester & View Options</h3>
           <div class="form-group">
             <label for="semester">Semester:</label>
             <select id="semester" name="semester">
@@ -80,21 +70,25 @@
             <label for="view_type">Data Structure:</label>
             <select id="view_type" name="view_type">
               <option value="tcm">Transitive Closure Map</option>
-              <option value="graph">Interactive Graph</option>
+              <option value="graph">Graph</option>
             </select>
           </div>
         </div>
 
         <button type="submit" class="submit-btn">
           <i class="fas fa-unlock"></i>
-          Show what it unlocks (what it is a prerequisite for)
+          Show what it unlocks
         </button>
       </form>
     </div>
   </div>
 
+  <!-- Config passed from Flask for JS without inline templating inside JS -->
+  <div id="config" data-max-courses="{{ max_courses_taken }}" hidden></div>
+
   <script>
-    const maxCourses = {{ max_courses_taken }};  // Your existing Flask variable
+    const configEl = document.getElementById('config');
+    const maxCourses = parseInt(configEl.dataset.maxCourses, 10);
     const minCourses = 5;
     const step = 5;
     const courseInputsDiv = document.getElementById('course-inputs');
@@ -104,12 +98,10 @@
     function createCourseInput(index) {
       const div = document.createElement('div');
       div.className = 'course-input';
-      
       const input = document.createElement('input');
       input.id = 'code' + index;
       input.name = 'code' + index;
-      input.placeholder = 'Course code ' + index;
-      
+      input.placeholder = 'Code ' + index;
       div.appendChild(input);
       return div;
     }
@@ -117,25 +109,20 @@
     addBtn.addEventListener('click', function() {
       const currentCount = courseInputsDiv.querySelectorAll('input').length;
       if (currentCount >= maxCourses) return;
-      
       const nextCount = Math.min(currentCount + step, maxCourses);
       for (let i = currentCount + 1; i <= nextCount; i++) {
-        const courseInputDiv = createCourseInput(i);
-        courseInputsDiv.appendChild(courseInputDiv);
+        courseInputsDiv.appendChild(createCourseInput(i));
       }
-      
       updateButtonStates();
     });
 
     rmBtn.addEventListener('click', function() {
       const currentCount = courseInputsDiv.querySelectorAll('input').length;
       if (currentCount <= minCourses) return;
-      
       const removeCount = Math.min(step, currentCount - minCourses);
       for (let i = 0; i < removeCount; i++) {
         courseInputsDiv.removeChild(courseInputsDiv.lastElementChild);
       }
-      
       updateButtonStates();
     });
 
@@ -148,30 +135,15 @@
     // Initial state
     updateButtonStates();
 
-    // Add smooth animations to form interactions
-    document.addEventListener('DOMContentLoaded', function() {
-      const inputs = document.querySelectorAll('input, select');
-      inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-          this.parentElement.style.transform = 'translateY(-2px)';
-        });
-        
-        input.addEventListener('blur', function() {
-          this.parentElement.style.transform = 'translateY(0)';
-        });
-      });
-    });
-
-    // Form validation feedback
+    // Basic form validation
     document.querySelector('form').addEventListener('submit', function(e) {
       const tentativeCode = document.getElementById('tentative-code').value.trim();
       if (!tentativeCode) {
         e.preventDefault();
-        document.getElementById('tentative-code').focus();
-        document.getElementById('tentative-code').style.borderColor = '#e74c3c';
-        setTimeout(() => {
-          document.getElementById('tentative-code').style.borderColor = '#e1e5e9';
-        }, 3000);
+        const el = document.getElementById('tentative-code');
+        el.focus();
+        el.style.borderColor = '#e74c3c';
+        setTimeout(() => { el.style.borderColor = '#e1e5e9'; }, 3000);
       }
     });
   </script>

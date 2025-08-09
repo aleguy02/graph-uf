@@ -1,5 +1,6 @@
 from src.tcm import TCM
 from src.graph import Graph
+import pytest
 
 SEM = "sm25"
 
@@ -10,4 +11,5 @@ def test_tcm_matches_graph(complex_g: Graph):
 
 def test_tcm_missing_course():
     tcm = TCM({})
-    assert tcm.postreqs("ABC", SEM) == set()
+    with pytest.raises(ValueError):
+        tcm.postreqs("ABC", SEM)
