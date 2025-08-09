@@ -25,7 +25,7 @@
                   {{ course }}
                   <div class="tooltip-box">
                     <strong>{{ tooltip_info[course]['name'] }}</strong><br>
-                    Credits: {{ tooltip_info[course]['credits'] }}<br>
+                    Credits: {{ tooltip_info.get(course, {}).get('credits', '—') }}<br><br>
                     {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
                     {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
                   </div>

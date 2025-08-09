@@ -41,7 +41,6 @@ def index():
         title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
-        url=config.URL,
         max_courses_taken=config.MAX_COURSES_TAKEN,
     )
 
@@ -70,7 +69,7 @@ def unlocks_redirect():
     
     view = request.form.get("view_type", "")
     if view != "tcm" and view != "graph":
-        abort(404, "Bad view type")
+        abort(400, "Bad view type")
         
     return redirect(url_for("main.unlocks_page", code=code, completed=_to_CSV(completed), semester=sem, view_type=view))
 
@@ -94,7 +93,7 @@ def unlocks_page(code: str):
     try:
         unlocked = struct.postreqs(base, sem)  # all downstream courses
     except ValueError:
-        abort(500, f"Code not found in catalog: {base}")
+        abort(400, f"Course not found in catalog: {base}")
     
     # all courses in unlocks for which you would meet all or some prerequisites or where the only prerequisite is the tentative course
     meet_prereqs = set()
@@ -117,7 +116,7 @@ def unlocks_page(code: str):
             else:
                 not_meet_prereqs.add(c)
         except (AttributeError, KeyError):
-            abort(500, f"Course not found in catalog: {c}")
+            abort(400, f"Course not found in catalog: {c}")
     
 
     return render_template("unlocks.html",
