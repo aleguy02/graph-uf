@@ -24,6 +24,24 @@ body {
   min-height: 100vh;
 }
 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-container h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 /* Enhanced Nav Bar styles */
 .nav-bar {
   display: flex;
@@ -48,7 +66,7 @@ body {
 }
 
 .nav-logo img {
-  width: 90px;
+  width: 6rem;
   height: auto;
   display: block;
 }
@@ -394,16 +412,16 @@ select:focus {
 /* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
   /* Navigation responsive styles */
-  .nav-links .nav-link {
+  .disappear-mobile {
     display: none;
   }
 
-  .nav-content {
-    padding: 0 15px;
+  .nav-bar {
+    padding: 0 1rem;
   }
 
-  .nav-logo img {
-    width: 150px;
+  .nav-bar i {
+    font-size: 2rem;
   }
 
   /* Mobile content adjustments */
