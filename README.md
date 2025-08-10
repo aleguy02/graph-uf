@@ -44,10 +44,11 @@ We use a feature branch and pull request (PR) workflow.
    .myenv\Scripts\activate      # Windows
    ```
 
-3. **Install dependencies**
+3. **Install dependencies and pre-commit hooks**
 
    ```bash
    pip install -r requirements.txt
+   pre-commit install
    ```
 
 4. **Create a `.env` file**
