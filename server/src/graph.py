@@ -7,7 +7,9 @@ from collections import deque
 
 class Graph:
     def __init__(self):
-        self.adj_list: dict[str, dict[str, set[str]]] = (
+        self.adj_list: dict[
+            str, dict[str, set[str]]
+        ] = (
             {}
         )  # adj_list stores: {  COURSE_CODE: { UNLOCKED_COURSE: [ SEMESTERS... ] }  }
 

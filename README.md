@@ -3,7 +3,7 @@
 # GraphUF
 GraphUF is a web tool that helps students see not just what a class requires, but what a class enables. When planning your schedule, it’s hard to know which future opportunities a course will unlock — the official UF site only shows prerequisites, not the courses that depend on it.
 
-With GraphUF, you can select any course and instantly see every class it leads to, including indirect ones (prerequisite-of-a-prerequisite). You can even enter the classes you’ve already taken, and GraphUF will filter results to show only the courses you would be NEWLY eligible to take. This makes it easy to discover hidden pathways and plan strategically for your academic goals.
+With GraphUF, you can select any course and instantly see every class it leads to, including indirect ones (prerequisite-of-a-prerequisite). You can even enter the classes you’ve already taken, and GraphUF will filter results to show you which courses you're closer to unlocking. This makes it easy to discover hidden pathways and plan strategically for your academic goals.
 
 ## Table of Contents
 
@@ -96,8 +96,8 @@ We use a feature branch and pull request (PR) workflow.
    * Copy `example.env` to `.env` in the root directory.
    * Update environment variables as needed.
 
-5. **Run the development server**  
-!! WAIT !!  
+5. **Run the development server**
+!! WAIT !!
 If this is your first time setting the app up, you need to get all the data from UF's Schedules API. Luckily, there's a few scripts that do this for you. See [Data Processing](#data-processing) for more information on how to do this.
 
    ```bash
@@ -108,8 +108,8 @@ If this is your first time setting the app up, you need to get all the data from
 
 ## Data Processing
 
-### Scraping UF SoC Data  
-Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.  
+### Scraping UF SoC Data
+Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.
 ```bash
 python ../scripts/scrape_soc.py
 python ../scripts/clean_soc.py
