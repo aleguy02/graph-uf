@@ -9,6 +9,7 @@ import pytest
 
 SEM = "sm25"
 
+
 def test_basic_chain():
     g = Graph()
 

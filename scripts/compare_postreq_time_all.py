@@ -2,15 +2,16 @@ import time
 from pathlib import Path
 import sys
 
-#ensures project root is on sys.path when the script is run directly
+# ensures project root is on sys.path when the script is run directly
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from app import create_app
 
-SEMESTER = "f25" #fall 2025 chosen for its large course list
+SEMESTER = "f25"  # fall 2025 chosen for its large course list
 GRAPH_REPS = 1
 TCM_REPS = 100
+
 
 def avg_time(func, *args, reps: int = 1) -> float:
     """average seconds per call"""
@@ -21,7 +22,7 @@ def avg_time(func, *args, reps: int = 1) -> float:
 
 
 def main() -> None:
-    #starts the app to test in real environment
+    # starts the app to test in real environment
     app = create_app({"TESTING": True})
     graph = app.config["COURSE_GRAPH"]
     tcm = app.config["COURSE_TCM"]

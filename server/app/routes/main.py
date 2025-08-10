@@ -25,6 +25,7 @@ def normalise(code: str) -> str | None:
     m = CODE_RE.match(code.upper().replace(" ", ""))
     return m.group(0) if m else None
 
+
 def _to_CSV(vals: list[str]) -> str | None:
     if not vals:
         return None
@@ -66,12 +67,20 @@ def unlocks_redirect():
         completed.append(base)
 
     sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
-    
+
     view = request.form.get("view_type", "")
     if view != "tcm" and view != "graph":
         abort(400, "Bad view type")
-        
-    return redirect(url_for("main.unlocks_page", code=code, completed=_to_CSV(completed), semester=sem, view_type=view))
+
+    return redirect(
+        url_for(
+            "main.unlocks_page",
+            code=code,
+            completed=_to_CSV(completed),
+            semester=sem,
+            view_type=view,
+        )
+    )
 
 
 @main_bp.route("/unlocks/<code>")
@@ -88,16 +97,20 @@ def unlocks_page(code: str):
     if view != "tcm" and view != "graph":
         abort(400, "Bad view type")
 
-    struct = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
-    
+    struct = (
+        current_app.config["COURSE_TCM"]
+        if view == "tcm"
+        else current_app.config["COURSE_GRAPH"]
+    )
+
     try:
         unlocked = struct.postreqs(base, sem)  # all downstream courses
     except ValueError:
         abort(400, f"Course not found in catalog: {base}")
-    
+
     # all courses in unlocks for which you would meet all or some prerequisites or where the only prerequisite is the tentative course
     meet_prereqs = set()
-    
+
     # all courses in unlocks for which you do not meet any other prereqs, excluding tentative course
     not_meet_prereqs = set()
 
@@ -110,21 +123,25 @@ def unlocks_page(code: str):
         graph = current_app.config["COURSE_GRAPH"]
         try:
             adj = graph.getAdjList()
-            c_prereqs = set(src for src, targets in adj.items() if c in targets and sem in targets[c])
-            if (not c_prereqs.isdisjoint(completed) or c_prereqs == {base}):
+            c_prereqs = set(
+                src
+                for src, targets in adj.items()
+                if c in targets and sem in targets[c]
+            )
+            if not c_prereqs.isdisjoint(completed) or c_prereqs == {base}:
                 meet_prereqs.add(c)
             else:
                 not_meet_prereqs.add(c)
         except (AttributeError, KeyError):
             abort(400, f"Course not found in catalog: {c}")
-    
 
-    return render_template("unlocks.html",
-                           title=f"{base} unlocks",
-                           code=base,
-                           not_meet_prereqs=sorted(not_meet_prereqs),
-                           meet_prereqs=sorted(meet_prereqs),
-                           semesters=current_app.config["SEMESTERS"],
-                           selected_semester=sem,
-                           tooltip_info=current_app.config["TOOLTIP_INFO"].get(sem, {})
-                           )
+    return render_template(
+        "unlocks.html",
+        title=f"{base} unlocks",
+        code=base,
+        not_meet_prereqs=sorted(not_meet_prereqs),
+        meet_prereqs=sorted(meet_prereqs),
+        semesters=current_app.config["SEMESTERS"],
+        selected_semester=sem,
+        tooltip_info=current_app.config["TOOLTIP_INFO"].get(sem, {}),
+    )

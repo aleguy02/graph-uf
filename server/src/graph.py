@@ -4,11 +4,16 @@ Adjacency list representation of graph; FROM prereqs TO class
 
 from collections import deque
 
+
 class Graph:
     def __init__(self):
-        self.adj_list: dict[str, dict[str, set[str]]] = {} # adj_list stores: {  COURSE_CODE: { UNLOCKED_COURSE: [ SEMESTERS... ] }  }
+        self.adj_list: dict[str, dict[str, set[str]]] = (
+            {}
+        )  # adj_list stores: {  COURSE_CODE: { UNLOCKED_COURSE: [ SEMESTERS... ] }  }
 
-    def insertEdge(self, from_: str, to_: str, semester: str):  # `from` keyword is reserved in python
+    def insertEdge(
+        self, from_: str, to_: str, semester: str
+    ):  # `from` keyword is reserved in python
         from_ = from_.upper()
         to_ = to_.upper()
 
@@ -48,7 +53,7 @@ class Graph:
 
         v.remove(root)
         return v
-    
+
     def getDirectPostreqs(self, course: str, semester: str) -> set[str]:
         res = set()
         neighbors = self.adj_list[course]
@@ -56,5 +61,5 @@ class Graph:
         for neighbor, sems_available in neighbors.items():
             if semester in sems_available:
                 res.add(neighbor)
-        
+
         return res
