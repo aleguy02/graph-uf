@@ -20,8 +20,29 @@ With GraphUF, you can select any course and instantly see every class it leads t
 ### Prerequisites
 
 * Python **3.13.x**
+* Docker
 * Linux-based OS (preferred, but not required)
 * [Flask](https://flask.palletsprojects.com/) and project dependencies (installed later)
+
+---
+
+## Quickstart
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/aleguy02/COP3530-project3.git
+   cd COP3530-project3
+   ```
+
+2. **Run the app in a container**
+
+!! WAIT !!
+If this is your first time running the app, you need to get all the data from UF's Schedules API. See [Data Processing](#data-processing).
+
+   ```bash
+   docker compose up
+   ```
 
 ---
 
