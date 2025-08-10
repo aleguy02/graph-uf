@@ -4,7 +4,6 @@ Run this test with `python -m pytest tests/test_graph.py`
 """
 
 from src.graph import Graph
-import pdb
 import pytest
 
 SEM = "sm25"

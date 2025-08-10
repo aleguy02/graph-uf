@@ -39,7 +39,7 @@ cython_debug/
 .pypirc
 
 # scrape data
-server/src/json/*.json
+src/json/*.json
 
 # pytest
 .pytest_cache

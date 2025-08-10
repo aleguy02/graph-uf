@@ -36,47 +36,6 @@ We use a feature branch and pull request (PR) workflow.
    cd COP3530-project3
    ```
 
-2. **Create a branch**
-
-   ```bash
-   git branch <your-name>/<branch-description>
-   git checkout <your-name>/<branch-description>
-   ```
-
-   * `<your-name>` → your name (e.g., `ale`)
-   * `<branch-description>` → short, hyphen-separated description (e.g., `fix-visual-bug`, `refactor-tests`, `create-graph-api`)
-
-4. **Ensure you are passing the tests (update the tests only if necessary)**
-
-   ```bash
-   python -m pytest
-   ```
-
-4. **Commit and push changes**
-
-   ```bash
-   git add .
-   git commit -m "Commit message"
-   git push origin <your-name>/<branch-description>
-   ```
-
-5. **Open a pull request**
-
-   * Go to the repository’s GitHub page.
-   * Click **Compare & pull request** when prompted.
-   * Add a description (optional; Coderabbit can auto-generate one).
-   * Submit the PR for review.
-
----
-
-## Server Setup
-
-1. **Navigate to the server directory**
-
-   ```bash
-   cd server
-   ```
-
 2. **Set up a virtual environment**
 
    ```bash
@@ -96,7 +55,41 @@ We use a feature branch and pull request (PR) workflow.
    * Copy `example.env` to `.env` in the root directory.
    * Update environment variables as needed.
 
-5. **Run the development server**
+5. **Create a branch**
+
+   ```bash
+   git branch <your-name>/<branch-description>
+   git checkout <your-name>/<branch-description>
+   ```
+
+   * `<your-name>` → your name (e.g., `ale`)
+   * `<branch-description>` → short, hyphen-separated description (e.g., `fix-visual-bug`, `refactor-tests`, `create-graph-api`)
+
+6. **Ensure you are passing the tests (update the tests only if necessary)**
+
+   ```bash
+   python -m pytest
+   ```
+
+7. **Commit and push changes**
+
+   ```bash
+   git add .
+   git commit -m "Commit message"
+   git push origin <your-name>/<branch-description>
+   ```
+
+8. **Open a pull request**
+
+   * Go to the repository’s GitHub page.
+   * Click **Compare & pull request** when prompted.
+   * Add a description (optional; Coderabbit can auto-generate one).
+   * Submit the PR for review.
+
+---
+
+## Server Setup
+
 !! WAIT !!
 If this is your first time setting the app up, you need to get all the data from UF's Schedules API. Luckily, there's a few scripts that do this for you. See [Data Processing](#data-processing) for more information on how to do this.
 
@@ -111,8 +104,8 @@ If this is your first time setting the app up, you need to get all the data from
 ### Scraping UF SoC Data
 Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.
 ```bash
-python ../scripts/scrape_soc.py
-python ../scripts/clean_soc.py
+python scripts/scrape_soc.py
+python scripts/clean_soc.py
 ```
 
 (Optional) Verify duplicates were removed:
@@ -126,7 +119,7 @@ python ../scripts/clean_soc.py
 Sometimes in development, you'll want to be able to glance only at the important data. Run the following command to create a streamlined file only keeping `{code, name, prerequisites}` for each course:
 
 ```bash
-jq '{courses: [.courses[] | {code, name, prerequisites}]}' src/json/soc_cleaned.json > src/json/streamlined_soc.json
+jq '{courses: [.courses[] | {code, name, prerequisites}]}' src/json/soc_cleaned_semester.json > src/json/streamlined_soc.json
 ```
 
 If you only want to keep courses **with** prerequisites:
