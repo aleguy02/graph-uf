@@ -13,4 +13,4 @@ def test_config():
     assert testing_app.testing
     assert isinstance(testing_app.config["COURSE_GRAPH"], Graph)
     assert isinstance(testing_app.config["COURSE_TCM"], TCM)
-    assert testing_app.config["TOOLTIP_INFO"]
+    assert isinstance(testing_app.config["TOOLTIP_INFO"], dict)

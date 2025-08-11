@@ -1,0 +1,33 @@
+name: Run Tests
+on:
+  push:
+    branches:
+      - main
+      - github-actions
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Tests
+    env:
+      TESTING: true
+      URL: localhost:5000
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13.3'
+
+      - name: Create Virtual Environment
+        run: python -m venv virtualenv && source virtualenv/bin/activate
+
+      - name: Install Dependencies
+        run: virtualenv/bin/pip install -r requirements.txt
+
+      - name: Run Tests
+        run: virtualenv/bin/python -m pytest
