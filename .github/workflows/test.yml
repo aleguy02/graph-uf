@@ -23,8 +23,11 @@ jobs:
         with:
           python-version: '3.13.3'
 
-      - name: Run Tests
-        run: |
-          python -m venv virtualenv
-          virtualenv/bin/pip install -r requirements.txt
-          python -m pytest
+      - name: Create Virtual Environment
+        run: python -m venv virtualenv && source virtualenv/bin/activate
+
+      - name: Create Virtual Environment
+        run: virtualenv/bin/pip install -r requirements.txt
+
+      - name: Create Virtual Environment
+        run: python -m pytest
