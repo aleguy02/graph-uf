@@ -26,8 +26,8 @@ jobs:
       - name: Create Virtual Environment
         run: python -m venv virtualenv && source virtualenv/bin/activate
 
-      - name: Create Virtual Environment
+      - name: Install Dependencies
         run: virtualenv/bin/pip install -r requirements.txt
 
-      - name: Create Virtual Environment
-        run: python -m pytest
+      - name: Run Tests
+        run: virtualenv/bin/python -m pytest
