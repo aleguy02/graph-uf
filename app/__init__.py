@@ -4,6 +4,7 @@ from app.routes.api import api_bp
 from pathlib import Path
 from src.loader import build_graph, build_tcm, build_tooltip, semesters
 
+
 def create_app(test_config=None):
     app = Flask(__name__)
 

@@ -38,8 +38,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# scrape data
-src/json/*.json
+# uncleaned scrape data
+src/json/soc_scraped_*.json
 
 # pytest
 .pytest_cache

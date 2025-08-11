@@ -92,14 +92,14 @@
     </div>
 
     <script>
-      const termMap = {"sp": "1", "sm": "5", "f": "8"} 
+      const termMap = {"sp": "1", "sm": "5", "f": "8"}
 
       const sem = '{{ selected_semester }}'
       const termID = termMap[sem.slice(0, -2)];
       const year = sem.slice(-2);
 
       const base_url = "https://one.uf.edu/soc/"
-      
+
       document.querySelectorAll('.tooltip').forEach(function(element) {
       element.addEventListener('click', function() {
         const ext = "?course-code=%22" + this.dataset.course.trim() + "%22" + "&category=%22CWSP%22" + "&term=%22" + `2${year}${termID}` + "%22"

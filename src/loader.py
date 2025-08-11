@@ -6,45 +6,41 @@ from .tcm import TCM
 semesters = [
     # 2018
     "f18",
-
     # 2019
     "sp19",
     "sm19",
     "f19",
-
     # 2020
     "sp20",
     "sm20",
     "f20",
-
     # 2021
     "sp21",
     "sm21",
     "f21",
-
     # 2022
     # "sp22",  # this file isn't being created atm so comment it out to avoid errors with build_graph()
     "sm22",
     "f22",
-
     # 2023
     "sp23",
     "sm23",
     "f23",
-
     # 2024
     "sp24",
     "sm24",
     "f24",
-
     # 2025
     "sp25",
     "sm25",
     "f25",
 ]
 
-_JSON_PATHS = [Path(__file__).parent / "json" / f"soc_cleaned_{s}.json" for s in semesters]
+_JSON_PATHS = [
+    Path(__file__).parent / "json" / f"soc_cleaned_{s}.json" for s in semesters
+]
 _COURSE_RE = re.compile(r"\b[A-Z]{3,4}\s?\d{4}[A-Z]?\b")
+
 
 def _extract_codes(s: str):
     s = s.split("Coreq")[0]  # we don't care about corequisites
@@ -55,7 +51,7 @@ def build_graph() -> Graph:
     g = Graph()
 
     for sem, fp in zip(semesters, _JSON_PATHS):
-        if not fp.exists(): #for missing semesters
+        if not fp.exists():  # for missing semesters
             continue
 
         data = json.loads(fp.read_text(encoding="utf-8"))
@@ -65,10 +61,12 @@ def build_graph() -> Graph:
                 g.insertEdge(p.upper(), tgt, sem)
     return g
 
+
 def build_tcm() -> TCM:
     graph = build_graph()
     tcm = TCM.from_graph(graph, semesters)
     return tcm
+
 
 def build_tooltip():
     tooltip = {}
@@ -84,11 +82,11 @@ def build_tooltip():
 
             code = c.get("code", "").strip().upper()
             name = c.get("name", "")
-            
+
             description = c.get("description", "").replace("\n", " ")
             if not description:
                 description = "No description given"
-            
+
             prerequisites = c.get("prerequisites", "")
 
             sections = c.get("sections", [])
@@ -98,7 +96,7 @@ def build_tooltip():
                 "name": name,
                 "description": description,
                 "prerequisites": prerequisites,
-                "credits": credits
-                }
+                "credits": credits,
+            }
 
     return tooltip

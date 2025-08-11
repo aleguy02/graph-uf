@@ -1,10 +1,11 @@
 from collections.abc import Mapping
 from .graph import Graph
 
+
 class TCM:
     def __init__(self, closure: Mapping[str, Mapping[str, set[str]]]):
-        copied = {} #dict[str, dict[str, set[str]]]
-        #deep copy
+        copied = {}  # dict[str, dict[str, set[str]]]
+        # deep copy
         for semester, course_map in closure.items():
             copied[semester] = {}
             for course, postreqs in course_map.items():
@@ -26,5 +27,5 @@ class TCM:
         semester_map = self._map.get(semester, {})
         if code.upper() not in semester_map:
             raise ValueError(f"Course code '{code}' not found")
-        
+
         return semester_map[code.upper()]

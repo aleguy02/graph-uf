@@ -3,7 +3,7 @@
 # GraphUF
 GraphUF is a web tool that helps students see not just what a class requires, but what a class enables. When planning your schedule, it’s hard to know which future opportunities a course will unlock — the official UF site only shows prerequisites, not the courses that depend on it.
 
-With GraphUF, you can select any course and instantly see every class it leads to, including indirect ones (prerequisite-of-a-prerequisite). You can even enter the classes you’ve already taken, and GraphUF will filter results to show only the courses you would be NEWLY eligible to take. This makes it easy to discover hidden pathways and plan strategically for your academic goals.
+With GraphUF, you can select any course and instantly see every class it leads to, including indirect ones (prerequisite-of-a-prerequisite). You can even enter the classes you’ve already taken, and GraphUF will filter results to show you which courses you're closer to unlocking. This makes it easy to discover hidden pathways and plan strategically for your academic goals.
 
 ## Table of Contents
 
@@ -20,8 +20,29 @@ With GraphUF, you can select any course and instantly see every class it leads t
 ### Prerequisites
 
 * Python **3.13.x**
+* Docker
 * Linux-based OS (preferred, but not required)
 * [Flask](https://flask.palletsprojects.com/) and project dependencies (installed later)
+
+---
+
+## Quickstart
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/aleguy02/COP3530-project3.git
+   cd COP3530-project3
+   ```
+
+2. **Run the app in a container**
+
+!! WAIT !!
+If this is your first time running the app, you need to get all the data from UF's Schedules API. See [Data Processing](#data-processing).
+
+   ```bash
+   docker compose up
+   ```
 
 ---
 
@@ -36,7 +57,27 @@ We use a feature branch and pull request (PR) workflow.
    cd COP3530-project3
    ```
 
-2. **Create a branch**
+2. **Set up a virtual environment**
+
+   ```bash
+   python -m venv .myenv
+   source .myenv/bin/activate   # Linux/Mac
+   .myenv\Scripts\activate      # Windows
+   ```
+
+3. **Install dependencies and pre-commit hooks**
+
+   ```bash
+   pip install -r requirements.txt
+   pre-commit install
+   ```
+
+4. **Create a `.env` file**
+
+   * Copy `example.env` to `.env` in the root directory.
+   * Update environment variables as needed.
+
+5. **Create a branch**
 
    ```bash
    git branch <your-name>/<branch-description>
@@ -46,13 +87,13 @@ We use a feature branch and pull request (PR) workflow.
    * `<your-name>` → your name (e.g., `ale`)
    * `<branch-description>` → short, hyphen-separated description (e.g., `fix-visual-bug`, `refactor-tests`, `create-graph-api`)
 
-4. **Ensure you are passing the tests (update the tests only if necessary)**
+6. **Ensure you are passing the tests (update the tests only if necessary)**
 
    ```bash
    python -m pytest
    ```
 
-4. **Commit and push changes**
+7. **Commit and push changes**
 
    ```bash
    git add .
@@ -60,7 +101,7 @@ We use a feature branch and pull request (PR) workflow.
    git push origin <your-name>/<branch-description>
    ```
 
-5. **Open a pull request**
+8. **Open a pull request**
 
    * Go to the repository’s GitHub page.
    * Click **Compare & pull request** when prompted.
@@ -71,33 +112,7 @@ We use a feature branch and pull request (PR) workflow.
 
 ## Server Setup
 
-1. **Navigate to the server directory**
-
-   ```bash
-   cd server
-   ```
-
-2. **Set up a virtual environment**
-
-   ```bash
-   python -m venv .myenv
-   source .myenv/bin/activate   # Linux/Mac
-   .myenv\Scripts\activate      # Windows
-   ```
-
-3. **Install dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Create a `.env` file**
-
-   * Copy `example.env` to `.env` in the root directory.
-   * Update environment variables as needed.
-
-5. **Run the development server**  
-!! WAIT !!  
+!! WAIT !!
 If this is your first time setting the app up, you need to get all the data from UF's Schedules API. Luckily, there's a few scripts that do this for you. See [Data Processing](#data-processing) for more information on how to do this.
 
    ```bash
@@ -108,11 +123,11 @@ If this is your first time setting the app up, you need to get all the data from
 
 ## Data Processing
 
-### Scraping UF SoC Data  
-Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.  
+### Scraping UF SoC Data
+Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.
 ```bash
-python ../scripts/scrape_soc.py
-python ../scripts/clean_soc.py
+python scripts/scrape_soc.py
+python scripts/clean_soc.py
 ```
 
 (Optional) Verify duplicates were removed:
@@ -126,7 +141,7 @@ python ../scripts/clean_soc.py
 Sometimes in development, you'll want to be able to glance only at the important data. Run the following command to create a streamlined file only keeping `{code, name, prerequisites}` for each course:
 
 ```bash
-jq '{courses: [.courses[] | {code, name, prerequisites}]}' src/json/soc_cleaned.json > src/json/streamlined_soc.json
+jq '{courses: [.courses[] | {code, name, prerequisites}]}' src/json/soc_cleaned_semester.json > src/json/streamlined_soc.json
 ```
 
 If you only want to keep courses **with** prerequisites:

@@ -18,9 +18,10 @@ N_VERTICES = 512
 REPS = 100
 LOOKUPS = 10_000
 
-#generates class codes
+# generates class codes
 VERTS = [f"CRS{i:04}" for i in range(N_VERTICES)]
-ROOT = VERTS[0] #first vertex is root
+ROOT = VERTS[0]  # first vertex is root
+
 
 def time_block(fn, *args, reps=1):
     start = time.perf_counter()
@@ -28,12 +29,14 @@ def time_block(fn, *args, reps=1):
         fn(*args)
     return time.perf_counter() - start
 
+
 def avg_time(fn, *args, reps=1):
     """
     average seconds per call
     """
     total = time_block(fn, *args, reps=reps)
     return total / reps
+
 
 def main():
     print(f"Creating fully connected graph with {N_VERTICES} vertices…")
@@ -50,7 +53,7 @@ def main():
     t_tcm = time.perf_counter() - t0
     print(f"TCM construction: {t_tcm*1e3:.0f} ms")
 
-    #accounts for first call taking longer
+    # accounts for first call taking longer
     _ = g.postreqs(ROOT, TEST_SEM)
     _ = tcm.postreqs(ROOT, TEST_SEM)
 
@@ -58,6 +61,7 @@ def main():
     tcm_avg = avg_time(tcm.postreqs, ROOT, TEST_SEM, reps=LOOKUPS)
     print(f"BFS average: {bfs_avg*1e3:.5f} ms")
     print(f"TCM average: {tcm_avg*1e3:.5f} ms")
+
+
 if __name__ == "__main__":
     main()
-
