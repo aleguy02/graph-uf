@@ -124,7 +124,7 @@ If this is your first time setting the app up, you need to get all the data from
 ## Data Processing
 
 ### Scraping UF SoC Data
-Do this from the `server` directory with your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.
+Have your virtual environment enabled and dependencies installed. `scrape_soc.py` will take roughly 40 minutes to execute, depending on your connection. It should be outputting hints live, so if you are running the script but not seeing output in your terminal, something went wrong.
 ```bash
 python scripts/scrape_soc.py
 python scripts/clean_soc.py
@@ -133,7 +133,7 @@ python scripts/clean_soc.py
 (Optional) Verify duplicates were removed:
 
 ```bash
-../scripts/verify_cleaned.sh
+./scripts/verify_cleaned.sh
 ```
 
 ### Streamlining JSON Data (Linux)
