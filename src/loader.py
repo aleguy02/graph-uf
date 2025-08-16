@@ -61,10 +61,63 @@ def build_graph() -> Graph:
                 g.insertEdge(p.upper(), tgt, sem)
     return g
 
+import re
+
+_SEM_RE = re.compile(r'^(f|sp|sm)(\d{2})$')
+def _parse_sem(sem: str) -> tuple[str, int]:
+    m = _SEM_RE.match(sem)
+    if not m:
+        raise ValueError(f"Bad semester code: {sem}")
+    term, yy = m.groups()
+    return term, 2000 + int(yy)
+
+def _same_season_fallback(target_sem: str, available: dict[str, bool], all_sems: list[str]) -> str | None:
+    """
+    Find the latest available same-season term <= target year.
+    Return None if none exists (e.g., 'sm18' when there's no earlier Summer).
+    """
+    term, year = _parse_sem(target_sem)
+    for s in reversed(all_sems):
+        t, y = _parse_sem(s)
+        if t == term and y <= year and available.get(s, False):
+            return s
+    return None
+
+
+def _build_academic_year_bundles(all_sems: list[str], json_paths: list[Path]) -> dict[str, list[str]]:
+    # availability map based on existing JSON files
+    available = {s: fp.exists() for s, fp in zip(all_sems, json_paths)}
+
+    # get candidate years from list
+    years = sorted({_parse_sem(s)[1] for s in all_sems})
+    bundles: dict[str, list[str]] = {}
+
+    for y in years:
+        sm = f"sm{str(y)[-2:]}"
+        fa = f"f{str(y)[-2:]}"
+        sp = f"sp{str(y + 1)[-2:]}"
+
+        # only build if at least one of the three is in the configured semester list
+        present_any = any(s in all_sems for s in (sm, fa, sp))
+        if not present_any:
+            continue
+
+        terms = []
+        for target in (sm, fa, sp):
+            effective = target if available.get(target, False) else _same_season_fallback(target, available, all_sems)
+            terms.append(effective)
+
+        bundle_key = f"AY{y}-{y+1}"
+        bundles[bundle_key] = terms
+
+    return bundles
 
 def build_tcm() -> TCM:
     graph = build_graph()
     tcm = TCM.from_graph(graph, semesters)
+    # build bundles, compute into tcm
+    bundles = _build_academic_year_bundles(semesters, _JSON_PATHS)
+    tcm.add_bundles(graph, bundles)
     return tcm
 
 

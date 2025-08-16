@@ -54,26 +54,37 @@
         </div>
 
         <div class="form-section">
-          <h3><i class="fas"></i>Semester & View Options</h3>
+          <h3><i class="fas"></i>Academic Year & View Options</h3>
           <div class="form-group">
-            <label for="semester">Semester:</label>
+            <label for="semester">Academic Year:</label>
             <select id="semester" name="semester">
-              {% for sem in semesters %}
-                <option value="{{ sem }}" {% if sem == default_semester %}selected{% endif %}>
-                  {{ sem|upper }}
-                </option>
-              {% endfor %}
+              {# Preferred: iterate academic years if provided #}
+              {% if academic_years is defined and academic_years %}
+                {% for ay in academic_years %}
+                  <option value="{{ ay }}" {% if ay == default_ay %}selected{% endif %}>
+                    {{ ay[2:] | replace('-', '–') }}  {# turns AY2025-2026 -> 2025–2026 #}
+                  </option>
+                {% endfor %}
+              {% else %}
+                {# Fallback: old single-term list still works until backend is updated #}
+                {% for sem in semesters %}
+                  <option value="{{ sem }}" {% if sem == default_semester %}selected{% endif %}>
+                    {{ sem | upper }}
+                  </option>
+                {% endfor %}
+              {% endif %}
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="view_type">Data Structure:</label>
-            <select id="view_type" name="view_type">
-              <option value="tcm">Transitive Closure Map</option>
-              <option value="graph">Graph</option>
-            </select>
-          </div>
-        </div>
+  <div class="form-group">
+    <label for="view_type">Data Structure:</label>
+    <select id="view_type" name="view_type">
+      <option value="tcm">Transitive Closure Map</option>
+      <option value="graph">Graph</option>
+    </select>
+  </div>
+</div>
+
 
         <button type="submit" class="submit-btn">
           <i class="fas fa-unlock"></i>

@@ -31,6 +31,20 @@ def _to_CSV(vals: list[str]) -> str | None:
         return None
     return ",".join(vals)
 
+def _resolve_selected_semesters(selected: str) -> tuple[str, list[str]]:
+    """
+    Returns (lookup_key, term_list).
+    -if `selected` is an academic year key (like 'AY2025-2026'), the term list comes from app.config['AY_TERMS'][selected].
+    -if list, split it
+    -otherwise it is single term.
+    """
+    ay_terms = current_app.config.get("AY_TERMS", {})
+    if selected in ay_terms:
+        return selected, ay_terms[selected]
+    if "," in selected:
+        parts = [p.strip() for p in selected.split(",") if p.strip()]
+        return selected, parts
+    return selected, [selected]
 
 @main_bp.route("/")
 def index():
@@ -42,10 +56,10 @@ def index():
         title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
+        academic_years=current_app.config.get("ACADEMIC_YEARS", current_app.config.get("AY_TERMS", {}).keys()),
+        default_ay=current_app.config.get("DEFAULT_AY", current_app.config["DEFAULT_SEMESTER"]),
         max_courses_taken=config.MAX_COURSES_TAKEN,
     )
-
-
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
     raw = request.form.get("tentative-code", "")
@@ -92,48 +106,57 @@ def unlocks_page(code: str):
     completed_raw = request.args.get("completed", "")
     completed = set(completed_raw.split(",")) if completed_raw else set()
 
-    sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
+    # selected value may be AY key (like 'AY2025-2026'), comma list, or single term
+    selected = request.args.get("semester", current_app.config.get("DEFAULT_AY", current_app.config["DEFAULT_SEMESTER"]))
     view = request.args.get("view_type", "")
-    if view != "tcm" and view != "graph":
+    if view not in ("tcm", "graph"):
         abort(400, "Bad view type")
 
-    struct = (
-        current_app.config["COURSE_TCM"]
-        if view == "tcm"
-        else current_app.config["COURSE_GRAPH"]
-    )
+    # resolve to (lookup_key, terms)
+    ay_key, term_list = _resolve_selected_semesters(selected)
+
+    sem_set = set(term_list)
+
+    struct = current_app.config["COURSE_TCM"] if view == "tcm" else current_app.config["COURSE_GRAPH"]
 
     try:
-        unlocked = struct.postreqs(base, sem)  # all downstream courses
+        if view == "tcm":
+            unlocked = struct.postreqs(base, ay_key)
+        else:
+            #bfs over the union of requested terms
+            unlocked = struct.postreqs(base, term_list)
     except ValueError:
         abort(400, f"Course not found in catalog: {base}")
 
-    # all courses in unlocks for which you would meet all or some prerequisites or where the only prerequisite is the tentative course
     meet_prereqs = set()
-
-    # all courses in unlocks for which you do not meet any other prereqs, excluding tentative course
     not_meet_prereqs = set()
 
     for c in unlocked:
         """
-        Get prerequisites for course c using the same logic as the url_for(api_bp.prereqs()) API route
-        please review this code carefully in code review. It may be wise to opt for an internal API call if we want
-        to use the prereqs API elsewhere in the app. For now, it is more efficient to just duplicate the logic
+        compute direct prereqs for c under the union of selected terms.
         """
         graph = current_app.config["COURSE_GRAPH"]
         try:
             adj = graph.getAdjList()
-            c_prereqs = set(
+            c_prereqs = {
                 src
                 for src, targets in adj.items()
-                if c in targets and sem in targets[c]
-            )
+                if c in targets and (targets[c] & sem_set)
+            }
             if not c_prereqs.isdisjoint(completed) or c_prereqs == {base}:
                 meet_prereqs.add(c)
             else:
                 not_meet_prereqs.add(c)
         except (AttributeError, KeyError):
             abort(400, f"Course not found in catalog: {c}")
+    # Build a merged tooltip map across the selected terms.
+    # Prefer later terms first (e.g., sp26 over f25 over sm25).
+    tooltip_union = {}
+    for sem_code in reversed(term_list):  # latest first
+        info = current_app.config["TOOLTIP_INFO"].get(sem_code, {})
+        # only set if missing so later-term info wins
+        for k, meta in info.items():
+            tooltip_union.setdefault(k, meta)
 
     return render_template(
         "unlocks.html",
@@ -141,7 +164,26 @@ def unlocks_page(code: str):
         code=base,
         not_meet_prereqs=sorted(not_meet_prereqs),
         meet_prereqs=sorted(meet_prereqs),
+
+        # keep terms for legacy fallback in the templates
         semesters=current_app.config["SEMESTERS"],
-        selected_semester=sem,
-        tooltip_info=current_app.config["TOOLTIP_INFO"].get(sem, {}),
+
+        # academic-year dropdown (e.g., ["AY2025-2026", ...])
+        academic_years=list(
+            current_app.config.get("ACADEMIC_YEARS", current_app.config.get("AY_TERMS", {}).keys())
+        ),
+
+        # what the user picked (AY key like "AY2025-2026")
+        selected_semester=ay_key,
+
+        # single effective term for SOC links & tooltips (e.g., last term in the AY)
+        effective_term=term_list[-1] if term_list else selected,
+
+        # tooltip data keyed by the effective term
+        tooltip_info=tooltip_union,
+
+        # preserve selected data-structure toggle in the template
+        view_type=view,
     )
+
+

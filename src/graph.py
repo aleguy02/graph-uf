@@ -3,7 +3,7 @@ Adjacency list representation of graph; FROM prereqs TO class
 """
 
 from collections import deque
-
+from typing import Iterable
 
 class Graph:
     def __init__(self):
@@ -29,16 +29,17 @@ class Graph:
     def getAdjList(self):
         return self.adj_list
 
-    def postreqs(self, root: str, semester: str) -> set[str]:
+    def postreqs(self, root: str, semesters: str | Iterable[str]) -> set[str]:
         """
         BFS traversal from root to all reachable nodes.
         Returns all classes that require root as in their prerequisite chain
-        Only traverses along given semester
+        Only traverses along given semesters
         """
         root = root.upper()
         if root not in self.adj_list:
             raise ValueError("Node not in graph")
 
+        sem_set = {semesters} if isinstance(semesters, str) else set(semesters)
         v = set()
         q = deque([root])
 
@@ -49,19 +50,20 @@ class Graph:
 
             v.add(node)
 
-            for neighbor, sems in self.adj_list[node].items():
-                if semester in sems and neighbor not in v:
+            for neighbor, sems_available in self.adj_list[node].items():
+                if sems_available & sem_set and neighbor not in v:
                     q.append(neighbor)
 
         v.remove(root)
         return v
 
-    def getDirectPostreqs(self, course: str, semester: str) -> set[str]:
+    def getDirectPostreqs(self, course: str, semesters: str | Iterable[str]) -> set[str]:
+        sem_set = {semesters} if isinstance(semesters, str) else set(semesters)
         res = set()
         neighbors = self.adj_list[course]
 
         for neighbor, sems_available in neighbors.items():
-            if semester in sems_available:
+            if sems_available & sem_set:
                 res.add(neighbor)
 
         return res

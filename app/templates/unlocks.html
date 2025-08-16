@@ -10,7 +10,14 @@
   <div class="container">
     <div class="hero-section">
       <h1 class="hero-title">Courses unlocked by {{ code }}</h1>
-      <p class="hero-subtitle">{{ selected_semester|upper }}</p>
+      <p class="hero-subtitle">
+          {% if selected_semester and selected_semester[:2] == 'AY' %}
+            {{ selected_semester[2:] | replace('-', '–') }}
+          {% else %}
+            {{ selected_semester | upper }}
+          {% endif %}
+      </p>
+
     </div>
 
     {% if meet_prereqs %}
@@ -24,7 +31,7 @@
                 <span class="tooltip" data-course="{{ course }}" style="color: #1d539f;">
                   {{ course }}
                   <div class="tooltip-box">
-                    <strong>{{ tooltip_info[course]['name'] }}</strong><br>
+                    <strong>{{ tooltip_info.get(course, {}).get('name', course) }}</strong><br>
                     Credits: {{ tooltip_info.get(course, {}).get('credits', '—') }}<br><br>
                     {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
                     {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
@@ -48,8 +55,8 @@
                 <span class="tooltip" data-course="{{ course }}" style="color: #1d539f;">
                   {{ course }}
                   <div class="tooltip-box">
-                    <strong>{{ tooltip_info[course]['name'] }}</strong><br>
-                    Credits: {{ tooltip_info[course]['credits'] }}<br>
+                    <strong>{{ tooltip_info.get(course, {}).get('name', course) }}</strong><br>
+                    Credits: {{ tooltip_info.get(course, {}).get('credits', '—') }}<br>
                     {{ tooltip_info.get(course, {}).get('description', 'No description available') }}<br>
                     {{ tooltip_info.get(course, {}).get('prerequisites', 'No prerequisites available') }}
                   </div>
@@ -70,11 +77,22 @@
         <input type="hidden" name="completed" value="{{ request.args.get('completed', '') }}" />
         <div class="form-section">
           <div class="form-group">
-            <label for="semester-select">Semester:</label>
+            <label for="semester-select">Academic Year:</label>
             <select id="semester-select" name="semester">
-              {% for sem in semesters %}
-                <option value="{{ sem }}" {% if sem == selected_semester %}selected{% endif %}>{{ sem|upper }}</option>
-              {% endfor %}
+              {% if academic_years is defined and academic_years %}
+                {% for ay in academic_years %}
+                  <option value="{{ ay }}" {% if ay == selected_semester %}selected{% endif %}>
+                    {{ ay[2:] | replace('-', '–') }}
+                  </option>
+                {% endfor %}
+              {% else %}
+                {# Fallback to old terms if AY list isn't provided #}
+                {% for sem in semesters %}
+                  <option value="{{ sem }}" {% if sem == selected_semester %}selected{% endif %}>
+                    {{ sem | upper }}
+                  </option>
+                {% endfor %}
+              {% endif %}
             </select>
           </div>
 
@@ -92,21 +110,29 @@
     </div>
 
     <script>
-      const termMap = {"sp": "1", "sm": "5", "f": "8"}
+      // If backend provides a single effective term (e.g., last term of the AY), use it.
+      // Otherwise fall back to whatever 'selected_semester' is (works in legacy single-term mode).
+      const effectiveTerm = '{{ effective_term | default(selected_semester) }}';
 
-      const sem = '{{ selected_semester }}'
+      const termMap = {"sp": "1", "sm": "5", "f": "8"};
+
+      // Expect a single term like 'f25', 'sm25', 'sp26'
+      const sem = effectiveTerm;
       const termID = termMap[sem.slice(0, -2)];
       const year = sem.slice(-2);
 
-      const base_url = "https://one.uf.edu/soc/"
+      const base_url = "https://one.uf.edu/soc/";
 
       document.querySelectorAll('.tooltip').forEach(function(element) {
-      element.addEventListener('click', function() {
-        const ext = "?course-code=%22" + this.dataset.course.trim() + "%22" + "&category=%22CWSP%22" + "&term=%22" + `2${year}${termID}` + "%22"
-        window.open(base_url + ext, '_blank');
-      });
+        element.addEventListener('click', function() {
+          const ext = "?course-code=%22" + this.dataset.course.trim() + "%22"
+                    + "&category=%22CWSP%22"
+                    + "&term=%22" + `2${year}${termID}` + "%22";
+          window.open(base_url + ext, '_blank');
+        });
       });
     </script>
+
   </div>
 </body>
 </html>
