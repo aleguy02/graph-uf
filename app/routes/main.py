@@ -38,7 +38,7 @@ def index():
     """
     Returns home page
     """
-    completed = request.cookies.get("completed-courses")
+    completed = request.cookies.get("completed-courses", "[]")
     try:
         completed = set(json.loads(completed))
     except json.JSONDecodeError as e:
