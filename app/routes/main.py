@@ -38,12 +38,23 @@ def index():
     """
     Returns home page
     """
+    completed = request.cookies.get("completed-courses")
+    try:
+        completed = set(json.loads(completed))
+    except json.JSONDecodeError as e:
+        current_app.logger.exception(f"Error decoding JSON: {e}")
+        completed = set()
+
+    # Convert to a sorted list for stable JSON serialization in template (sets are not JSON serializable)
+    completed_list = sorted(completed)
+
     return render_template(
         "index.html",
         title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
         max_courses_taken=config.MAX_COURSES_TAKEN,
+        completed_courses=completed_list,
     )
 
 

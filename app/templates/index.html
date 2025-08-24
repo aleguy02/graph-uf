@@ -87,6 +87,8 @@
   <div id="config" data-max-courses="{{ max_courses_taken }}" hidden></div>
 
   <script>
+    // Server-provided previously completed courses (from cookie)
+    const PRECOMPLETED = JSON.parse('{{ completed_courses | tojson | safe }}');
     const configEl = document.getElementById('config');
     const maxCourses = parseInt(configEl.dataset.maxCourses, 10);
     const minCourses = 5;
@@ -132,7 +134,29 @@
       addBtn.disabled = currentCount >= maxCourses;
     }
 
-    // Initial state
+    // Helper to ensure at least n inputs exist (adding in step-sized batches without exceeding max)
+    function ensureInputCount(n) {
+      let currentCount = courseInputsDiv.querySelectorAll('input').length;
+      while (currentCount < n) {
+        for (let i = 0; i < 5; i++) {
+          courseInputsDiv.appendChild(createCourseInput(currentCount + 1));
+          currentCount++;
+        }
+      }
+    }
+
+    // Populate any pre-completed courses from cookie
+    if (Array.isArray(PRECOMPLETED) && PRECOMPLETED.length) {
+      ensureInputCount(Math.max(minCourses, PRECOMPLETED.length));
+      const inputs = courseInputsDiv.querySelectorAll('input');
+      PRECOMPLETED.forEach((code, idx) => {
+        if (idx < inputs.length) {
+          inputs[idx].value = code;
+        }
+      });
+    }
+
+    // Initial state after potential population
     updateButtonStates();
 
     // Basic form validation
