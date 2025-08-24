@@ -88,10 +88,10 @@ def unlocks_page(code: str):
     if not base:
         abort(400, f"Bad course code: {code}")
 
-    completed = request.cookies.get("completed-courses")
+    completed = request.cookies.get("completed-courses", "[]")
     try:
         completed = set(json.loads(completed))
-    except json.JSONDecodeError as e:
+    except Exception as e:
         current_app.logger.exception(f"Error decoding JSON: {e}")
         completed = set()
 
