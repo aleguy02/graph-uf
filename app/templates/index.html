@@ -151,7 +151,7 @@
         return;
       }
 
-      const validCourses = [];
+      const validCourses = new Set();
       const courseInputs = document.querySelectorAll('#course-inputs input');
 
       for (const input of courseInputs) {
@@ -164,13 +164,13 @@
             console.log('Invalid course input:', value);
             return;
           }
-          validCourses.push(value.toUpperCase());
+          validCourses.add(value.toUpperCase());
         }
       }
 
       const formData = new FormData();
       formData.append('tentative-code', tentativeCode.toUpperCase());
-      formData.append('completed-courses', JSON.stringify(validCourses));
+      formData.append('completed-courses', JSON.stringify(Array.from(validCourses)));
       formData.append('semester', document.getElementById('semester').value);
       formData.append('view_type', document.getElementById('view_type').value);
 

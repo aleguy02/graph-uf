@@ -10,14 +10,14 @@ from flask import (
     current_app,
     request,
     abort,
+    make_response,
 )
 from app.config import get_config
-import json
+import re, json
 
 main_bp: Blueprint = Blueprint("main", __name__)
 config = get_config()
 
-import re
 
 CODE_RE = re.compile(r"^[A-Z]{3,4}\d{4}[A-Z]?")
 
@@ -50,31 +50,25 @@ def index():
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
     code = request.form.get("tentative-code", "")
-
     completed = request.form.get(f"completed-courses", "[]")
-    try:
-        completed = json.loads(completed)
-    except json.JSONDecodeError as e:
-        current_app.logger.exception(f"Error decoding JSON: {e}")
-        completed = []
-
     sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
 
     view = request.form.get("view_type", "")
     if view not in ("tcm", "graph"):
         abort(400, "Bad view type")
 
-    return redirect(
-        url_for(
-            "main.unlocks_page",
-            code=code,
-            completed=_to_CSV(
-                completed
-            ),  # optimizaton, pass more efficiently, maybe in a cookie
-            semester=sem,
-            view_type=view,
+    resp = make_response(
+        redirect(
+            url_for(
+                "main.unlocks_page",
+                code=code,
+                semester=sem,
+                view_type=view,
+            )
         )
     )
+    resp.set_cookie("completed-courses", completed)
+    return resp
 
 
 @main_bp.route("/unlocks/<code>")
@@ -83,8 +77,12 @@ def unlocks_page(code: str):
     if not base:
         abort(400, f"Bad course code: {code}")
 
-    completed_raw = request.args.get("completed", "")
-    completed = set(completed_raw.split(",")) if completed_raw else set()
+    completed = request.cookies.get("completed-courses")
+    try:
+        completed = set(json.loads(completed))
+    except json.JSONDecodeError as e:
+        current_app.logger.exception(f"Error decoding JSON: {e}")
+        completed = set()
 
     sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     view = request.args.get("view_type", "")
