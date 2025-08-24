@@ -10,13 +10,14 @@ from flask import (
     current_app,
     request,
     abort,
+    make_response,
 )
 from app.config import get_config
+import re, json
 
 main_bp: Blueprint = Blueprint("main", __name__)
 config = get_config()
 
-import re
 
 CODE_RE = re.compile(r"^[A-Z]{3,4}\d{4}[A-Z]?")
 
@@ -37,50 +38,48 @@ def index():
     """
     Returns home page
     """
+    completed = request.cookies.get("completed-courses", "[]")
+    try:
+        completed = set(json.loads(completed))
+    except Exception as e:
+        current_app.logger.exception(f"Error decoding JSON: {e}")
+        completed = set()
+
+    # Convert to a sorted list for stable JSON serialization in template (sets are not JSON serializable)
+    completed_list = sorted(completed)
+
     return render_template(
         "index.html",
         title="GraphUF",
         semesters=current_app.config["SEMESTERS"],
         default_semester=current_app.config["DEFAULT_SEMESTER"],
         max_courses_taken=config.MAX_COURSES_TAKEN,
+        completed_courses=completed_list,
     )
 
 
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
-    raw = request.form.get("tentative-code", "")
-    code = normalise(raw)
-    if not code:
-        return redirect(url_for("main.index"))
-
-    # extract completed courses
-    completed = []
-    for i in range(1, config.MAX_COURSES_TAKEN + 1):
-        raw = request.form.get(f"code{i}", "")
-        if not raw:
-            continue
-
-        base = normalise(raw)
-        if not base:
-            return redirect(url_for("main.index"))
-
-        completed.append(base)
-
+    code = request.form.get("tentative-code", "")
+    completed = request.form.get(f"completed-courses", "[]")
     sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
 
     view = request.form.get("view_type", "")
-    if view != "tcm" and view != "graph":
+    if view not in ("tcm", "graph"):
         abort(400, "Bad view type")
 
-    return redirect(
-        url_for(
-            "main.unlocks_page",
-            code=code,
-            completed=_to_CSV(completed),
-            semester=sem,
-            view_type=view,
+    resp = make_response(
+        redirect(
+            url_for(
+                "main.unlocks_page",
+                code=code,
+                semester=sem,
+                view_type=view,
+            )
         )
     )
+    resp.set_cookie("completed-courses", completed)
+    return resp
 
 
 @main_bp.route("/unlocks/<code>")
@@ -89,8 +88,12 @@ def unlocks_page(code: str):
     if not base:
         abort(400, f"Bad course code: {code}")
 
-    completed_raw = request.args.get("completed", "")
-    completed = set(completed_raw.split(",")) if completed_raw else set()
+    completed = request.cookies.get("completed-courses", "[]")
+    try:
+        completed = set(json.loads(completed))
+    except Exception as e:
+        current_app.logger.exception(f"Error decoding JSON: {e}")
+        completed = set()
 
     sem = request.args.get("semester", current_app.config["DEFAULT_SEMESTER"])
     view = request.args.get("view_type", "")
@@ -114,6 +117,9 @@ def unlocks_page(code: str):
     # all courses in unlocks for which you do not meet any other prereqs, excluding tentative course
     not_meet_prereqs = set()
 
+    """
+    this readibility sucsk
+    """
     for c in unlocked:
         """
         Get prerequisites for course c using the same logic as the url_for(api_bp.prereqs()) API route
