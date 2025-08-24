@@ -12,6 +12,7 @@ from flask import (
     abort,
 )
 from app.config import get_config
+import json
 
 main_bp: Blueprint = Blueprint("main", __name__)
 config = get_config()
@@ -48,35 +49,28 @@ def index():
 
 @main_bp.route("/unlocks", methods=["POST"])
 def unlocks_redirect():
-    raw = request.form.get("tentative-code", "")
-    code = normalise(raw)
-    if not code:
-        return redirect(url_for("main.index"))
+    code = request.form.get("tentative-code", "")
 
-    # extract completed courses
-    completed = []
-    for i in range(1, config.MAX_COURSES_TAKEN + 1):
-        raw = request.form.get(f"code{i}", "")
-        if not raw:
-            continue
-
-        base = normalise(raw)
-        if not base:
-            return redirect(url_for("main.index"))
-
-        completed.append(base)
+    completed = request.form.get(f"completed-courses", "[]")
+    try:
+        completed = json.loads(completed)
+    except json.JSONDecodeError as e:
+        current_app.logger.exception(f"Error decoding JSON: {e}")
+        completed = []
 
     sem = request.form.get("semester", current_app.config["DEFAULT_SEMESTER"])
 
     view = request.form.get("view_type", "")
-    if view != "tcm" and view != "graph":
+    if view not in ("tcm", "graph"):
         abort(400, "Bad view type")
 
     return redirect(
         url_for(
             "main.unlocks_page",
             code=code,
-            completed=_to_CSV(completed),
+            completed=_to_CSV(
+                completed
+            ),  # optimizaton, pass more efficiently, maybe in a cookie
             semester=sem,
             view_type=view,
         )
@@ -114,6 +108,9 @@ def unlocks_page(code: str):
     # all courses in unlocks for which you do not meet any other prereqs, excluding tentative course
     not_meet_prereqs = set()
 
+    """
+    this readibility sucsk
+    """
     for c in unlocked:
         """
         Get prerequisites for course c using the same logic as the url_for(api_bp.prereqs()) API route

@@ -22,7 +22,7 @@
         <p>You can also enter a lower-level course you've already taken as a target to open show a wider range of course unlocks!</p>
       </div>
 
-      <form action="{{ url_for('main.unlocks_redirect') }}" method="post">
+      <form id="temp-form-name" action="{{ url_for('main.unlocks_redirect') }}" method="post">
         <div class="form-section">
           <h3><i class="fas fa-target"></i>Target Course</h3>
           <div class="form-group">
@@ -136,16 +136,70 @@
     updateButtonStates();
 
     // Basic form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
+    const CODE_RE = /^[A-Z]{3,4}\d{4}[A-Z]?/;
+
+    document.getElementById('temp-form-name').addEventListener('submit', function(e) {
+      e.preventDefault();
+
       const tentativeCode = document.getElementById('tentative-code').value.trim();
-      if (!tentativeCode) {
-        e.preventDefault();
+      if (!CODE_RE.test(tentativeCode)) {
         const el = document.getElementById('tentative-code');
         el.focus();
         el.style.borderColor = '#e74c3c';
-        setTimeout(() => { el.style.borderColor = '#e1e5e9'; }, 3000);
+        alert("Invalid course code(s)")
+        console.log('Invalid tentative code input:', tentativeCode);
+        return;
+      }
+
+      const validCourses = [];
+      const courseInputs = document.querySelectorAll('#course-inputs input');
+
+      for (const input of courseInputs) {
+        const value = input.value.trim();
+        if (value) { // Only process non-empty values
+          if (!CODE_RE.test(value)) {
+            input.focus();
+            input.style.borderColor = '#e74c3c';
+            alert("Invalid course code(s)");
+            console.log('Invalid course input:', value);
+            return;
+          }
+          validCourses.push(value.toUpperCase());
+        }
+      }
+
+      const formData = new FormData();
+      formData.append('tentative-code', tentativeCode.toUpperCase());
+      formData.append('completed-courses', JSON.stringify(validCourses));
+      formData.append('semester', document.getElementById('semester').value);
+      formData.append('view_type', document.getElementById('view_type').value);
+
+      fetch(this.action, {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        if (response.ok) {
+          window.location.href = response.url;
+        } else {
+          alert('Submission failed');
+        }
+      }).catch(error => {
+        console.error('Error:', error);
+        alert('Submission failed');
+      });
+    });
+
+    // Reset input styling when user interacts with any input
+    document.addEventListener('input', function(e) {
+      if (e.target.tagName === 'INPUT') {
+        e.target.style.borderColor = '';
       }
     });
+    document.addEventListener('input', function(e) {
+      if (e.target.tagName === 'INPUT') {
+        e.target.style.borderColor = '';
+      }
+    }, true);
   </script>
 </body>
 </html>
