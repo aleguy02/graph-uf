@@ -160,7 +160,7 @@
     updateButtonStates();
 
     // Basic form validation
-    const CODE_RE = /^[A-Z]{3,4}\d{4}[A-Z]?/;
+    const CODE_RE = /^[A-Za-z]{3,4}\d{4}[A-Za-z]?/;
 
     document.getElementById('temp-form-name').addEventListener('submit', function(e) {
       e.preventDefault();
