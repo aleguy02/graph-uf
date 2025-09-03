@@ -6,6 +6,7 @@ from typing import TypedDict, Any, List
 
 import requests
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 BASE_URL = "https://one.uf.edu/apix/soc/schedule"
 semesters = {
@@ -119,22 +120,51 @@ def fetch_soc(
     return soc
 
 
+def _scrape_one(s: str, term: str) -> tuple[str, bool, str | None]:
+    """Scrape a single semester and write its JSON file.
+    Returns tuple of (semester_key, success_flag, error_message_or_None).
+    """
+    try:
+        print(f"=== fetching SoC - {s} ===")
+        soc_scraped = fetch_soc(term, "CWSP")
+        fp = os.path.join(os.getcwd(), "src", "json", f"soc_scraped_{s}.json")
+
+        print(f"=== writing to {fp} ===")
+        soc_str = json.dumps(soc_scraped)
+        with open(fp, "w") as f:
+            f.write(soc_str)
+
+        print(f"DONE - {s}")
+        return (s, True, None)
+    except Exception as e:
+        msg = str(e)
+        print(f"!! An exception occurred for {s}: {msg} !!")
+        return (s, False, msg)
+
+
+def main():
+    WORKERS = 8
+    items = list(semesters.items())
+    results: list[tuple[str, bool, str | None]] = []
+    start = time.time()
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        future_map = {ex.submit(_scrape_one, s, term): s for s, term in items}
+        for fut in as_completed(future_map):
+            results.append(fut.result())
+
+    duration = time.time() - start
+    ok = [r for r in results if r[1]]
+    failed = [r for r in results if not r[1]]
+
+    print("=== SUMMARY ===")
+    print(
+        f"Total semesters: {len(results)} | Success: {len(ok)} | Failed: {len(failed)} | Elapsed: {duration:.1f}s"
+    )
+    if failed:
+        print("Failed semesters:")
+        for s, _, err in failed:
+            print(f"  - {s}: {err}")
+
+
 if __name__ == "__main__":
-    for s, term in semesters.items():
-        try:
-
-            print(f"=== fetching SoC - {s} ===")
-            soc_scraped = fetch_soc(term, "CWSP")
-
-            fp = os.path.join(os.getcwd(), "src", "json", f"soc_scraped_{s}.json")
-            print(f"=== writing to {fp} ===")
-            soc_str = json.dumps(soc_scraped)  # Convert to JSON
-            with open(fp, "w") as f:  # Save JSON as file
-                f.write(soc_str)
-
-            print("DONE")
-
-        except Exception as e:
-            print(
-                f"!! An exception occured: {e} !!"
-            )  # I think something is going wrong with sp22, need to look into it
+    main()
