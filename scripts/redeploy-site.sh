@@ -3,7 +3,7 @@
 
 set -eo pipefail
 
-PROJECT_DIR="$HOME/graph-uf/"
+PROJECT_DIR="/home/myuser/graph-uf/"
 URL="https://www.aleguy02.dev"
 MAX_RETRIES=5
 
@@ -38,7 +38,7 @@ done
 # Health check with retries
 retry_count=0
 while [ $retry_count -lt $MAX_RETRIES ]; do
-        if [ "$(curl --head $URL/health | awk '/^HTTP/{print $2}')" = "200" ]; then
+        if [ "$(curl --head $URL | awk '/^HTTP/{print $2}')" = "200" ]; then
                 echo "Health check passed"
                 break
         fi
@@ -52,7 +52,7 @@ while [ $retry_count -lt $MAX_RETRIES ]; do
         fi
 done
 if [ $retry_count -eq $MAX_RETRIES ]; then
-        echo "!! Could not reach the site at $URL/health or received a non-200 HTTP response. !!"
+        echo "!! Could not reach the site at $URL or received a non-200 HTTP response. !!"
         exit 1
 fi
 

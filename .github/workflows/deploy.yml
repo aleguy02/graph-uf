@@ -12,7 +12,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
-       (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'github-actions'))
+       github.event.workflow_run.head_branch == 'main')
     name: "Deploy to VPS"
     runs-on: ubuntu-latest
     steps:
@@ -35,5 +35,11 @@ jobs:
 
       - name: Redeploy Site
         run: |
-          ssh my-vps '~/redeploy-site.sh' \
-          ssh my-vps 'yes | cp ~/PE-portfolio/scripts/redeploy-site.sh ~/redeploy-site.sh'
+          set -euo pipefail
+          echo "=== running redeploy script on remote host ==="
+          ssh my-vps "echo $ROOT_PASSWORD | sudo -S ~/redeploy-site.sh"
+          echo "=== redeploy successful; syncing latest script copy ==="
+          ssh my-vps 'yes | cp ~/graph-uf/scripts/redeploy-site.sh ~/redeploy-site.sh'
+          echo "All remote commands finished."
+        env:
+          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
